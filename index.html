@@ -12,11 +12,11 @@ html, body {
   height:100%;
   background:#0f172a;
   font-family:Arial;
+  overflow-x:hidden;
 }
 
 body {
   display:flex;
-  overflow-x:hidden;
 }
 
 /* ================= SIDEBAR ================= */
@@ -33,32 +33,34 @@ body {
   position: relative;
   z-index:20;
 
-  /* smooth entrance/exit */
   transform: translateX(0);
   opacity: 1;
+
   transition: transform 0.35s ease, opacity 0.25s ease;
 }
 
-/* 🔥 GLASS FADE EXIT */
+/* 🔥 FIXED: NO MORE GHOST OVERLAY */
 .sidebar.hidden {
-  transform: translateX(-12%);
+  transform: translateX(-110%);
   opacity: 0;
+
   pointer-events: none;
-  visibility: hidden;
+  user-select: none;
+
+  /* KEY FIX: removes stacking interference completely */
+  z-index: -10;
 }
 
-/* safety fix so hidden sidebar never blocks clicks */
-.sidebar.hidden * {
-  pointer-events: none;
+/* restore z-index when visible */
+.sidebar:not(.hidden) {
+  z-index: 20;
 }
 
 /* ================= FLOATING GRIP HANDLE ================= */
 #toggleSidebarBtn {
   position: fixed;
-
   top: 50%;
   transform: translateY(-50%);
-
   left: 240px;
 
   width: 36px;
@@ -75,7 +77,6 @@ body {
 
   border: 1px solid rgba(255,255,255,0.08);
   border-left: none;
-
   border-radius: 0 14px 14px 0;
 
   cursor: pointer;
@@ -83,10 +84,7 @@ body {
 
   box-shadow: 6px 0 20px rgba(0,0,0,0.4);
 
-  transition:
-    left 0.35s ease,
-    transform 0.2s ease,
-    box-shadow 0.3s ease;
+  transition: left 0.35s ease, transform 0.2s ease;
 }
 
 /* grip lines */
@@ -124,7 +122,7 @@ body.sidebar-hidden #toggleSidebarBtn {
   border-radius: 14px;
 }
 
-/* ================= INPUT FIX ================= */
+/* ================= INPUT SAFETY ================= */
 * {
   box-sizing: border-box;
 }
@@ -167,6 +165,8 @@ body.sidebar-hidden #toggleSidebarBtn {
   flex:1;
   padding:20px;
   overflow-y:auto;
+  position:relative;
+  z-index:1;
 }
 
 /* ================= GRID ================= */
