@@ -35,8 +35,8 @@ const doodles = [
     name: "Wiglet Line",
     value: 10,
     group: "Swarms",
-    image: "https://static.wikia.nocookie.net/doodle-world/images/Twiglet.png",
-    forms: ["Wiglet", "Tewwys Mum"],
+    image: "https://static.wikia.nocookie.net/doodle-world/images/Wiglet.png",
+    forms: ["Wiglet"],
     trend: "stable"
   }
 ];
