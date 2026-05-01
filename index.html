@@ -51,7 +51,6 @@ button {
   border-radius:12px;
   position:relative;
   transition:.2s;
-  overflow:hidden;
 }
 
 .card:hover {
@@ -87,7 +86,6 @@ button {
   cursor:pointer;
 }
 
-/* IMAGE */
 img {
   width:100%;
   border-radius:8px;
@@ -130,6 +128,7 @@ input {
 
 </div>
 
+<!-- IMPORTANT: must load FIRST -->
 <script src="data.js"></script>
 
 <script>
@@ -138,33 +137,38 @@ let favorites = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
 
+/* SAFETY CHECK */
+if (!window.doodles) {
+  console.error("data.js not loaded or doodles is missing");
+}
+
 /* TIER */
 function getTier(v){
-  if(v<=20) return "low";
-  if(v<=200) return "mid";
-  if(v<=1000) return "high";
+  if(v <= 20) return "low";
+  if(v <= 200) return "mid";
+  if(v <= 1000) return "high";
   return "hype";
 }
 
 /* LABEL */
-function getDemandLabel(v){
-  if(v<=20) return "LOW DEMAND";
-  if(v<=200) return "MID DEMAND";
-  if(v<=1000) return "HIGH DEMAND";
+function getLabel(v){
+  if(v <= 20) return "LOW DEMAND";
+  if(v <= 200) return "MID DEMAND";
+  if(v <= 1000) return "HIGH DEMAND";
   return "HYPE / OVERPAID";
 }
 
-/* TREND */
+/* TREND SAFE */
 function trendIcon(t){
-  if(t==="up") return "⬆️";
-  if(t==="down") return "⬇️";
+  if(t === "up") return "⬆️";
+  if(t === "down") return "⬇️";
   return "➡️";
 }
 
-/* FAVORITES */
+/* FAVORITE */
 function toggleFav(name){
   if(favorites.includes(name)){
-    favorites = favorites.filter(f=>f!==name);
+    favorites = favorites.filter(f => f !== name);
   } else {
     favorites.push(name);
   }
@@ -174,43 +178,46 @@ function toggleFav(name){
 
 /* FILTER */
 function setFilter(f){
-  filterType=f;
+  filterType = f;
   render();
 }
 
-/* RENDER */
+/* RENDER (SAFE VERSION) */
 function render(){
-  const term = document.getElementById("search").value.toLowerCase();
-  grid.innerHTML="";
+  const term = (document.getElementById("search").value || "").toLowerCase();
+  grid.innerHTML = "";
 
-  doodles.forEach(d=>{
+  (window.doodles || []).forEach(d => {
+
+    if(!d || !d.name) return;
+
     if(term && !d.name.toLowerCase().includes(term)) return;
 
-    if(filterType==="rising" && d.trend!=="up") return;
-    if(filterType==="high" && d.value<200) return;
-    if(filterType==="hype" && d.value<1000) return;
-    if(filterType==="fav" && !favorites.includes(d.name)) return;
+    if(filterType === "rising" && d.trend !== "up") return;
+    if(filterType === "high" && d.value < 200) return;
+    if(filterType === "hype" && d.value < 1000) return;
+    if(filterType === "fav" && !favorites.includes(d.name)) return;
 
-    const tier = getTier(d.value);
+    const tier = getTier(d.value || 0);
+    const label = getLabel(d.value || 0);
+    const trend = d.trend || "stable";
 
-    const card=document.createElement("div");
-    card.className="card "+tier;
+    const card = document.createElement("div");
+    card.className = "card " + tier;
 
-    card.innerHTML=`
-      <div class="header ${tier}">
-        ${getDemandLabel(d.value)}
-      </div>
+    card.innerHTML = `
+      <div class="header ${tier}">${label}</div>
 
       <div class="star" onclick="toggleFav('${d.name}')">
         ${favorites.includes(d.name) ? "⭐" : "☆"}
       </div>
 
-      <img src="${d.image}"
+      <img src="${d.image || ''}"
       onerror="this.src='https://via.placeholder.com/200'">
 
       <h4>${d.name}</h4>
-      <p>💰 ${d.value}</p>
-      <p>${trendIcon(d.trend)}</p>
+      <p>💰 ${d.value ?? 0}</p>
+      <p>${trendIcon(trend)}</p>
     `;
 
     grid.appendChild(card);
