@@ -14,23 +14,52 @@ body {
   display:flex;
 }
 
+/* SIDEBAR */
 .sidebar {
   width:260px;
   background:#020617;
   padding:20px;
+  position:relative;
 }
 
-button {
+.sidebar button {
   width:100%;
   margin-bottom:8px;
   padding:10px;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   background:#1e293b;
   color:white;
   cursor:pointer;
+  transition:0.2s;
+  text-align:left;
 }
 
+.sidebar button:hover {
+  background:#334155;
+  transform:translateX(3px);
+}
+
+.sidebar button.active {
+  background:#334155;
+  border-left:3px solid #60a5fa;
+  padding-left:12px;
+}
+
+/* SLIDING INDICATOR */
+.indicator {
+  position:absolute;
+  left:0;
+  width:4px;
+  height:40px;
+  background:#60a5fa;
+  border-radius:4px;
+  transition:0.25s ease;
+  top:70px;
+  box-shadow:0 0 10px rgba(96,165,250,0.6);
+}
+
+/* MAIN */
 .main {
   flex:1;
   padding:20px;
@@ -42,6 +71,7 @@ button {
   gap:15px;
 }
 
+/* CARD */
 .card {
   background:#1e293b;
   padding:12px;
@@ -85,7 +115,6 @@ img {
 
 .topbar {
   display:flex;
-  gap:10px;
   margin-bottom:15px;
 }
 
@@ -101,12 +130,16 @@ input {
 <body>
 
 <div class="sidebar">
-  <h3>Filters</h3>
-  <button onclick="setFilter('all')">All</button>
-  <button onclick="setFilter('rising')">⬆️ Rising</button>
-  <button onclick="setFilter('high')">🔥 High</button>
-  <button onclick="setFilter('hype')">🚨 Hype</button>
-  <button onclick="setFilter('fav')">⭐ Favorites</button>
+
+<div class="indicator" id="indicator"></div>
+
+<h3>Filters</h3>
+<button onclick="setFilter('all')">All</button>
+<button onclick="setFilter('rising')">Rising</button>
+<button onclick="setFilter('high')">High Demand</button>
+<button onclick="setFilter('hype')">Hype</button>
+<button onclick="setFilter('fav')">Favorites</button>
+
 </div>
 
 <div class="main">
@@ -122,12 +155,10 @@ input {
 <script src="data.js"></script>
 
 <script>
-let filterType = "all";
+let activeFilter = "all";
 let favorites = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
-
-/* SAFE ACCESS */
 const list = window.doodles || [];
 
 /* TIER */
@@ -164,10 +195,45 @@ function toggleFav(name){
   render();
 }
 
+/* INDICATOR */
+function moveIndicator(index){
+  const el = document.getElementById("indicator");
+  el.style.top = (70 + index * 48) + "px";
+}
+
+function updateIndicator(){
+  const map = {
+    all: 0,
+    rising: 1,
+    high: 2,
+    hype: 3,
+    fav: 4
+  };
+  moveIndicator(map[activeFilter]);
+}
+
+/* ACTIVE BUTTON */
+function updateActiveButton(){
+  document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
+
+  const map = {
+    all: 0,
+    rising: 1,
+    high: 2,
+    hype: 3,
+    fav: 4
+  };
+
+  const btns = document.querySelectorAll(".sidebar button");
+  btns[map[activeFilter]]?.classList.add("active");
+}
+
 /* FILTER */
 function setFilter(f){
-  filterType = f;
+  activeFilter = f;
   render();
+  updateActiveButton();
+  updateIndicator();
 }
 
 /* RENDER */
@@ -176,24 +242,23 @@ function render(){
   grid.innerHTML = "";
 
   list.forEach(d => {
-
     if(!d) return;
 
     if(term && !d.name.toLowerCase().includes(term)) return;
 
-    if(filterType === "rising" && d.trend !== "up") return;
-    if(filterType === "high" && d.value < 200) return;
-    if(filterType === "hype" && d.value < 1000) return;
-    if(filterType === "fav" && !favorites.includes(d.name)) return;
+    if(activeFilter === "rising" && d.trend !== "up") return;
+    if(activeFilter === "high" && d.value < 200) return;
+    if(activeFilter === "hype" && d.value < 1000) return;
+    if(activeFilter === "fav" && !favorites.includes(d.name)) return;
 
-    const tier = getTier(d.value || 0);
+    const tier = getTier(d.value);
 
     const card = document.createElement("div");
     card.className = "card " + tier;
 
     card.innerHTML = `
       <div class="header ${tier}">
-        ${getLabel(d.value || 0)}
+        ${getLabel(d.value)}
       </div>
 
       <div class="star" onclick="toggleFav('${d.name}')">
@@ -214,7 +279,10 @@ function render(){
 /* SEARCH */
 document.getElementById("search").addEventListener("input", render);
 
+/* INIT */
 render();
+updateActiveButton();
+updateIndicator();
 </script>
 
 </body>
