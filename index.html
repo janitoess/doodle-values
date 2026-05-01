@@ -152,6 +152,7 @@ input {
 
 </div>
 
+<!-- LOAD DATA -->
 <script src="data.js"></script>
 
 <script>
@@ -160,10 +161,8 @@ let favorites = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
 
-/* ✅ FIXED: dynamic data access */
-function getList(){
-  return window.doodles || [];
-}
+/* ✅ DIRECT ACCESS (FIXED) */
+const list = doodles;
 
 /* TIER */
 function getTier(v){
@@ -231,7 +230,7 @@ function render(){
   const term = (document.getElementById("search").value || "").toLowerCase();
   grid.innerHTML = "";
 
-  getList().forEach(d => {
+  list.forEach(d => {
 
     if(!d) return;
     if(term && !d.name.toLowerCase().includes(term)) return;
