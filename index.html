@@ -64,18 +64,7 @@ body {
   overflow:hidden;
 }
 
-/* ================= BORDER BASE LAYER ================= */
-.family-card::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:14px;
-  padding:2px;
-  z-index:0;
-  pointer-events:none;
-}
-
-/* ================= SHIMMER OVERLAY ================= */
+/* ================= SHIMMER ================= */
 .family-card::after {
   content:"";
   position:absolute;
@@ -102,6 +91,14 @@ body {
 }
 
 /* ================= RARITY BORDERS ================= */
+.family-card::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  padding:2px;
+  z-index:0;
+}
 
 /* LOW */
 .family-card.low::before {
@@ -214,8 +211,16 @@ function render(){
 
   doodles.forEach(d => {
 
+    const v = d.values.UHT6;
+
+    let tier = "low";
+    if (v <= 5) tier = "low";
+    else if (v <= 10) tier = "mid";
+    else if (v <= 15) tier = "high";
+    else tier = "hype";
+
     const card = document.createElement("div");
-    card.className = "family-card";
+    card.className = `family-card ${tier}`;
 
     card.innerHTML = `
       <div class="family-header">
