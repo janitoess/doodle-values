@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Doodle Value Families</title>
+<title>Doodle Value Market</title>
 
 <style>
 body {
@@ -21,28 +21,6 @@ body {
   padding:20px;
 }
 
-.sidebar button {
-  width:100%;
-  margin-bottom:8px;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  background:#1e293b;
-  color:white;
-  cursor:pointer;
-  text-align:left;
-  transition:0.2s;
-}
-
-.sidebar button:hover {
-  transform:translateX(3px);
-}
-
-.sidebar button.active {
-  background:#334155;
-  border-left:3px solid #60a5fa;
-}
-
 /* MAIN */
 .main {
   flex:1;
@@ -57,10 +35,12 @@ body {
 
 /* FAMILY CARD */
 .family-card {
-  background:#1e293b;
-  border-radius:12px;
+  position:relative;
+  border-radius:14px;
   padding:12px;
+  background:#1e293b;
   cursor:pointer;
+  overflow:hidden;
   transition:0.2s;
 }
 
@@ -68,11 +48,94 @@ body {
   transform:scale(1.02);
 }
 
+/* SHIMMER */
+.family-card::after {
+  content:"";
+  position:absolute;
+  top:0;
+  left:-150%;
+  width:80%;
+  height:100%;
+  background:linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255,255,255,0.05) 40%,
+    rgba(255,255,255,0.12) 50%,
+    rgba(255,255,255,0.05) 60%,
+    transparent 100%
+  );
+  transform:skewX(-20deg);
+  animation: shimmerMove 4s infinite;
+  pointer-events:none;
+}
+
+@keyframes shimmerMove {
+  0% { left:-150%; }
+  100% { left:150%; }
+}
+
+/* BORDER GRADIENTS */
+.family-card.low::before,
+.family-card.mid::before,
+.family-card.high::before,
+.family-card.hype::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  padding:2px;
+  border-radius:14px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+}
+
+.family-card.low::before { background:linear-gradient(135deg,#60a5fa,#1e3a8a); }
+.family-card.mid::before { background:linear-gradient(135deg,#4ade80,#14532d); }
+.family-card.high::before { background:linear-gradient(135deg,#facc15,#92400e); }
+
+.family-card.hype::before {
+  background:linear-gradient(270deg,#f87171,#fb7185,#f97316);
+  background-size:400% 400%;
+  animation:hypeBorder 3s ease infinite;
+}
+
+@keyframes hypeBorder {
+  0% { background-position:0% 50%; }
+  50% { background-position:100% 50%; }
+  100% { background-position:0% 50%; }
+}
+
+/* HEADER */
 .family-header {
   display:flex;
   justify-content:space-between;
   align-items:center;
   font-weight:bold;
+}
+
+/* BADGE */
+.badge {
+  font-size:11px;
+  padding:4px 10px;
+  border-radius:999px;
+}
+
+.badge.low { color:#60a5fa; background:rgba(96,165,250,0.15); }
+.badge.mid { color:#4ade80; background:rgba(74,222,128,0.15); }
+.badge.high { color:#facc15; background:rgba(250,204,21,0.15); }
+.badge.hype {
+  color:#f87171;
+  background:rgba(248,113,113,0.15);
+  animation: badgePulse 1.6s infinite;
+}
+
+@keyframes badgePulse {
+  0% { box-shadow:0 0 0 rgba(248,113,113,0); }
+  50% { box-shadow:0 0 12px rgba(248,113,113,0.6); }
+  100% { box-shadow:0 0 0 rgba(248,113,113,0); }
 }
 
 /* IMAGE */
@@ -82,16 +145,25 @@ img {
   margin-top:10px;
 }
 
-/* COLLAPSE */
+/* CONTENT */
 .family-content {
-  display:none;
-  margin-top:10px;
-  font-size:13px;
-  opacity:0.9;
+  max-height:0;
+  opacity:0;
+  overflow:hidden;
+  transform:translateY(-5px);
+  transition:0.25s ease;
 }
 
 .family-card.open .family-content {
-  display:block;
+  max-height:500px;
+  opacity:1;
+  transform:translateY(0);
+}
+
+.family-card:hover .family-content {
+  max-height:500px;
+  opacity:0.9;
+  transform:translateY(0);
 }
 
 .forms {
@@ -107,13 +179,7 @@ img {
 
 <body>
 
-<div class="sidebar">
-<h3>Filters</h3>
-<button onclick="setFilter('all')">All</button>
-<button onclick="setFilter('rising')">Rising</button>
-<button onclick="setFilter('high')">High Demand</button>
-<button onclick="setFilter('hype')">Hype</button>
-</div>
+<div class="sidebar"></div>
 
 <div class="main">
 <div class="grid" id="grid"></div>
@@ -122,18 +188,20 @@ img {
 <script src="data.js"></script>
 
 <script>
-let activeFilter = "all";
 const grid = document.getElementById("grid");
 
-/* TOGGLE FAMILY */
-function toggleFamily(card){
-  card.classList.toggle("open");
+/* BADGE LOGIC */
+function getBadge(d){
+  const v = d.values.UHT6;
+  if(v <= 5) return { label:"LOW DEMAND", tier:"low" };
+  if(v <= 10) return { label:"MID DEMAND", tier:"mid" };
+  if(v <= 15) return { label:"HIGH DEMAND", tier:"high" };
+  return { label:"🔥 HYPE / HOT", tier:"hype" };
 }
 
-/* FILTER */
-function setFilter(f){
-  activeFilter = f;
-  render();
+/* TOGGLE */
+function toggle(card){
+  card.classList.toggle("open");
 }
 
 /* RENDER */
@@ -141,42 +209,36 @@ function render(){
   grid.innerHTML = "";
 
   doodles.forEach(d => {
-
-    if(activeFilter === "rising" && d.trend !== "up") return;
-    if(activeFilter === "high" && d.values.UHT6 < 10) return;
-    if(activeFilter === "hype" && d.values.UHT6 < 15) return;
+    const badge = getBadge(d);
 
     const card = document.createElement("div");
-    card.className = "family-card";
+    card.className = `family-card ${badge.tier}`;
 
     card.innerHTML = `
       <div class="family-header">
         <div>${d.name}</div>
-        <div>▼</div>
+        <div class="badge ${badge.tier}">${badge.label}</div>
       </div>
 
       <img src="${d.image}" onerror="this.src='https://via.placeholder.com/200'">
 
       <div class="family-content">
         <div class="forms">
-          Forms: ${d.forms.join(" → ")}
+          ${d.forms.join(" → ")}
         </div>
 
         <div class="values">
-          ${Object.entries(d.values)
-            .map(([k,v]) => `<div>${k}: ${v}</div>`)
-            .join("")}
+          ${Object.entries(d.values).map(([k,v]) => `<div>${k}: ${v}</div>`).join("")}
         </div>
       </div>
     `;
 
-    card.addEventListener("click", () => toggleFamily(card));
+    card.addEventListener("click", () => toggle(card));
 
     grid.appendChild(card);
   });
 }
 
-/* INIT */
 render();
 </script>
 
