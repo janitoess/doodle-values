@@ -46,7 +46,7 @@ body {
   padding-left:12px;
 }
 
-/* SLIDING INDICATOR */
+/* INDICATOR */
 .indicator {
   position:absolute;
   left:0;
@@ -159,7 +159,11 @@ let activeFilter = "all";
 let favorites = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
-const list = window.doodles || [];
+
+/* ✅ FIXED: dynamic data access */
+function getList(){
+  return window.doodles || [];
+}
 
 /* TIER */
 function getTier(v){
@@ -197,34 +201,20 @@ function toggleFav(name){
 
 /* INDICATOR */
 function moveIndicator(index){
-  const el = document.getElementById("indicator");
-  el.style.top = (70 + index * 48) + "px";
+  document.getElementById("indicator").style.top = (70 + index * 48) + "px";
 }
 
 function updateIndicator(){
-  const map = {
-    all: 0,
-    rising: 1,
-    high: 2,
-    hype: 3,
-    fav: 4
-  };
+  const map = { all:0, rising:1, high:2, hype:3, fav:4 };
   moveIndicator(map[activeFilter]);
 }
 
 /* ACTIVE BUTTON */
 function updateActiveButton(){
-  document.querySelectorAll(".sidebar button").forEach(b => b.classList.remove("active"));
-
-  const map = {
-    all: 0,
-    rising: 1,
-    high: 2,
-    hype: 3,
-    fav: 4
-  };
-
   const btns = document.querySelectorAll(".sidebar button");
+  btns.forEach(b => b.classList.remove("active"));
+
+  const map = { all:0, rising:1, high:2, hype:3, fav:4 };
   btns[map[activeFilter]]?.classList.add("active");
 }
 
@@ -241,9 +231,9 @@ function render(){
   const term = (document.getElementById("search").value || "").toLowerCase();
   grid.innerHTML = "";
 
-  list.forEach(d => {
-    if(!d) return;
+  getList().forEach(d => {
 
+    if(!d) return;
     if(term && !d.name.toLowerCase().includes(term)) return;
 
     if(activeFilter === "rising" && d.trend !== "up") return;
