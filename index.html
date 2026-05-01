@@ -6,29 +6,28 @@
 <title>Doodle Value Market</title>
 
 <style>
-/* ================= BASE LAYOUT ================= */
-body {
+/* ================= GLOBAL ================= */
+html, body {
   margin:0;
-  font-family:Arial;
+  padding:0;
+  height:100%;
   background:#0f172a;
-  color:white;
-  display:flex;
+  font-family:Arial;
+}
+
+/* ================= PAGE LAYOUT (FIXED) ================= */
+.app {
+  display:grid;
+  grid-template-columns:240px 1fr;
   height:100vh;
-  overflow:hidden;
 }
 
 /* ================= SIDEBAR ================= */
 .sidebar {
-  width:240px;
-  min-width:240px;
   background:#020617;
   padding:20px;
-  height:100vh;
+  border-right:1px solid rgba(255,255,255,0.08);
   overflow-y:auto;
-  position:sticky;
-  top:0;
-  z-index:20;
-  border-right:1px solid rgba(255,255,255,0.05);
 }
 
 .sidebar h3 {
@@ -56,10 +55,8 @@ body {
 
 /* ================= MAIN ================= */
 .main {
-  flex:1;
   padding:20px;
   overflow-y:auto;
-  min-width:0;
 }
 
 /* ================= GRID ================= */
@@ -69,7 +66,7 @@ body {
   gap:15px;
 }
 
-/* ================= FAMILY CARD ================= */
+/* ================= CARD ================= */
 .family-card {
   position:relative;
   border-radius:14px;
@@ -110,7 +107,7 @@ body {
   100% { left:120%; }
 }
 
-/* ================= BORDER GRADIENT ================= */
+/* ================= BORDER ================= */
 .family-card::before {
   content:"";
   position:absolute;
@@ -149,11 +146,10 @@ body {
   100% { background-position:0% 50%; }
 }
 
-/* ================= HEADER + BADGE ================= */
+/* ================= HEADER ================= */
 .family-header {
   display:flex;
   justify-content:space-between;
-  align-items:center;
   font-weight:bold;
 }
 
@@ -219,18 +215,22 @@ img {
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <h3>Filters</h3>
-  <button onclick="setFilter('all')">All</button>
-  <button onclick="setFilter('rising')">Rising</button>
-  <button onclick="setFilter('high')">High</button>
-  <button onclick="setFilter('hype')">Hype</button>
-</div>
+<div class="app">
 
-<!-- MAIN -->
-<div class="main">
-  <div class="grid" id="grid"></div>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Filters</h3>
+    <button onclick="setFilter('all')">All</button>
+    <button onclick="setFilter('rising')">Rising</button>
+    <button onclick="setFilter('high')">High</button>
+    <button onclick="setFilter('hype')">Hype</button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="grid" id="grid"></div>
+  </div>
+
 </div>
 
 <script src="data.js"></script>
