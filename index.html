@@ -38,28 +38,42 @@ body {
   color:white;
   cursor:pointer;
   text-align:left;
+  transition:0.2s;
+  position:relative;
+  overflow:hidden;
 }
 
-/* search */
-.sidebar input {
-  width:100%;
-  padding:10px;
-  margin:10px 0 12px 0;
-  border-radius:10px;
-  border:none;
-  outline:none;
-  background:#1e293b;
-  color:white;
+.sidebar button:hover {
+  transform:translateX(6px);
+  background:#334155;
 }
 
-/* sort */
-.sidebar select {
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  background:#1e293b;
-  color:white;
-  border:none;
+.sidebar button.active {
+  background:#334155;
+  box-shadow:0 0 12px rgba(59,130,246,0.25);
+  transform:translateX(6px);
+}
+
+/* animated shimmer sweep */
+.sidebar button::after {
+  content:"";
+  position:absolute;
+  top:0;
+  left:-120%;
+  width:60%;
+  height:100%;
+  background:linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.08),
+    transparent
+  );
+  transform:skewX(-20deg);
+}
+
+.sidebar button:hover::after {
+  left:120%;
+  transition:0.5s;
 }
 
 /* ================= MAIN ================= */
@@ -87,10 +101,10 @@ body {
   transition:transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* hover expand */
 .family-card:hover {
   transform:scale(1.04);
   z-index:10;
+  box-shadow:0 12px 35px rgba(0,0,0,0.5);
 }
 
 /* ================= SHIMMER ================= */
@@ -138,22 +152,18 @@ body {
   pointer-events:none;
 }
 
-/* LOW */
 .family-card.low::before {
   background:linear-gradient(135deg,#60a5fa,#1e3a8a);
 }
 
-/* MID */
 .family-card.mid::before {
   background:linear-gradient(135deg,#4ade80,#14532d);
 }
 
-/* HIGH */
 .family-card.high::before {
   background:linear-gradient(135deg,#facc15,#92400e);
 }
 
-/* HYPE */
 .family-card.hype::before {
   background:linear-gradient(270deg,#f87171,#fb7185,#f97316);
   background-size:400% 400%;
@@ -166,22 +176,11 @@ body {
   100% { background-position:0% 50%; }
 }
 
-/* ================= GLOW SYSTEM ================= */
-.glow-low {
-  box-shadow:0 0 10px rgba(96,165,250,0.15);
-}
-
-.glow-mid {
-  box-shadow:0 0 14px rgba(74,222,128,0.18);
-}
-
-.glow-high {
-  box-shadow:0 0 18px rgba(250,204,21,0.22);
-}
-
-.glow-hype {
-  box-shadow:0 0 25px rgba(248,113,113,0.35);
-}
+/* ================= GLOW ================= */
+.glow-low { box-shadow:0 0 10px rgba(96,165,250,0.15); }
+.glow-mid { box-shadow:0 0 14px rgba(74,222,128,0.18); }
+.glow-high { box-shadow:0 0 18px rgba(250,204,21,0.22); }
+.glow-hype { box-shadow:0 0 25px rgba(248,113,113,0.35); }
 
 /* ================= HEADER ================= */
 .family-header {
@@ -202,11 +201,7 @@ body {
 .badge.low { background:rgba(96,165,250,0.15); color:#60a5fa; }
 .badge.mid { background:rgba(74,222,128,0.15); color:#4ade80; }
 .badge.high { background:rgba(250,204,21,0.15); color:#facc15; }
-
-.badge.hype {
-  background:rgba(248,113,113,0.15);
-  color:#f87171;
-}
+.badge.hype { background:rgba(248,113,113,0.15); color:#f87171; }
 
 /* ================= IMAGE ================= */
 img {
@@ -243,11 +238,6 @@ img {
 .value-low { color:#f87171; }
 .value-mid { color:#facc15; }
 .value-high { color:#4ade80; }
-
-.values div:hover {
-  color:#ffffff;
-  transform:translateX(2px);
-}
 </style>
 </head>
 
@@ -257,21 +247,14 @@ img {
 <div class="sidebar">
   <h3 style="color:white;">Filters</h3>
 
-  <input id="search" placeholder="Search doodles...">
-
-  <button onclick="setFilter('all')">All</button>
-  <button onclick="setFilter('rising')">Rising</button>
-  <button onclick="setFilter('high')">High</button>
-  <button onclick="setFilter('hype')">Hype</button>
+  <button onclick="setFilter('all', this)" class="active">All</button>
+  <button onclick="setFilter('rising', this)">Rising</button>
+  <button onclick="setFilter('high', this)">High</button>
+  <button onclick="setFilter('hype', this)">Hype</button>
 
   <hr style="border:1px solid #1e293b; margin:12px 0;">
 
-  <select id="sort">
-    <option value="default">Sort: Default</option>
-    <option value="valueHigh">UHT6 High → Low</option>
-    <option value="valueLow">UHT6 Low → High</option>
-    <option value="name">Name A → Z</option>
-  </select>
+  <button onclick="sortAZ()">Sort: A → Z</button>
 </div>
 
 <!-- MAIN -->
@@ -285,28 +268,27 @@ img {
 const grid = document.getElementById("grid");
 
 let activeFilter = "all";
-let searchQuery = "";
-let sortMode = "default";
-
-/* SEARCH */
-document.getElementById("search").addEventListener("input", e => {
-  searchQuery = e.target.value.toLowerCase();
-  render();
-});
-
-/* SORT */
-document.getElementById("sort").addEventListener("change", e => {
-  sortMode = e.target.value;
-  render();
-});
+let activeBtn = null;
 
 /* FILTER */
-function setFilter(f){
+function setFilter(f, btn){
   activeFilter = f;
+  render();
+
+  if(activeBtn) activeBtn.classList.remove("active");
+  if(btn){
+    btn.classList.add("active");
+    activeBtn = btn;
+  }
+}
+
+/* SORT A-Z ONLY */
+function sortAZ(){
+  doodles.sort((a,b) => a.name.localeCompare(b.name));
   render();
 }
 
-/* VALUE COLOR */
+/* COLOR */
 function getColor(v){
   if(v <= 5) return "value-low";
   if(v <= 10) return "value-mid";
@@ -319,13 +301,6 @@ function render(){
 
   let list = [...doodles];
 
-  /* SEARCH */
-  if(searchQuery){
-    list = list.filter(d =>
-      d.name.toLowerCase().includes(searchQuery)
-    );
-  }
-
   /* FILTER */
   list = list.filter(d => {
     const v = d.values.UHT6;
@@ -337,18 +312,6 @@ function render(){
     return true;
   });
 
-  /* SORT */
-  if(sortMode === "valueHigh"){
-    list.sort((a,b) => b.values.UHT6 - a.values.UHT6);
-  }
-  if(sortMode === "valueLow"){
-    list.sort((a,b) => a.values.UHT6 - b.values.UHT6);
-  }
-  if(sortMode === "name"){
-    list.sort((a,b) => a.name.localeCompare(b.name));
-  }
-
-  /* CARDS */
   list.forEach(d => {
 
     const v = d.values.UHT6;
@@ -358,17 +321,19 @@ function render(){
 
     if (v <= 5) {
       tier = "low";
+      badgeText = "LOW DEMAND";
     } else if (v <= 10) {
       tier = "mid";
+      badgeText = "MID DEMAND";
     } else if (v <= 15) {
       tier = "high";
+      badgeText = "HIGH DEMAND";
     } else {
       tier = "hype";
+      badgeText = "HYPE DEMAND";
     }
 
-    /* GLOW INTENSITY */
     let glow = "glow-low";
-
     if (v > 5) glow = "glow-mid";
     if (v > 10) glow = "glow-high";
     if (v > 15) glow = "glow-hype";
@@ -385,10 +350,11 @@ function render(){
     card.innerHTML = `
       <div class="family-header">
         <div>${d.name}
-          <span style="margin-left:6px;">
-            ${d.trend === "up" ? "📈" : d.trend === "down" ? "📉" : "➖"}
+          <span style="margin-left:6px; font-size:11px; opacity:0.7;">
+            ${d.trend.toUpperCase()}
           </span>
         </div>
+        <div class="badge ${tier}">${badgeText}</div>
       </div>
 
       <img src="${d.image}">
