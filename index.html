@@ -23,7 +23,6 @@ body {
   overflow: hidden;
 }
 
-/* SIDEBAR */
 .sidebar {
   width: 240px;
   background: #0b1220;
@@ -54,7 +53,6 @@ body {
   color: white;
 }
 
-/* MAIN */
 .main {
   flex: 1;
   padding: 25px;
@@ -76,14 +74,12 @@ input {
   width: 220px;
 }
 
-/* GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 15px;
 }
 
-/* CARD */
 .card {
   background: #1e293b;
   padding: 15px;
@@ -123,7 +119,6 @@ img {
 
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <h2>Doodle Values</h2>
 
@@ -134,7 +129,6 @@ img {
   <button class="group-btn" onclick="setGroup('Other', this)">Other</button>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
   <div class="topbar">
@@ -146,7 +140,6 @@ img {
 
 </div>
 
-<!-- DATA -->
 <script src="data.js"></script>
 
 <script>
@@ -165,7 +158,7 @@ function render(list) {
     card.style.animationDelay = (i * 0.03) + "s";
 
     card.innerHTML = `
-      <img src="${d.image}" />
+      <img src="${d.image}" onerror="this.src='https://via.placeholder.com/300x180?text=Doodle+Image'" />
       <h3>${d.name}</h3>
       <div class="value">Value: ${d.value}</div>
       <div class="forms">Forms: ${d.forms.join(", ")}</div>
