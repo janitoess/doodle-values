@@ -1,42 +1,62 @@
 const doodles = [
   {
     name: "Snobat Line",
-    value: 10,
     group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/Snobat.png",
     forms: ["Snobat", "Cryotera"],
-    trend: "stable"
+    trend: "stable",
+    values: {
+      MHT6: 1,
+      MHTINT6: 10,
+      UHT6: 10
+    }
   },
   {
     name: "Bunsweet Line",
-    value: 10,
     group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/Bunsweet.png",
     forms: ["Bunsweet", "Bunswirl"],
-    trend: "up"
+    trend: "up",
+    values: {
+      MHT6: 2,
+      MHTINT6: 12,
+      UHT6: 15
+    }
   },
   {
     name: "Pebblett Line",
-    value: 10,
     group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/Pebblet.png",
     forms: ["Pebblett", "Bolduo", "Monolugg"],
-    trend: "down"
+    trend: "down",
+    values: {
+      MHT6: 1,
+      MHTINT6: 9,
+      UHT6: 11
+    }
   },
   {
     name: "Fluppy Line",
-    value: 10,
     group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/Fluppy.png",
     forms: ["Fluppy"],
-    trend: "stable"
+    trend: "stable",
+    values: {
+      MHT6: 1,
+      MHTINT6: 10,
+      UHT6: 10
+    }
   },
   {
     name: "Wiglet Line",
-    value: 10,
     group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/Wiglet.png",
     forms: ["Wiglet"],
-    trend: "stable"
+    trend: "stable",
+    values: {
+      MHT6: 1,
+      MHTINT6: 10,
+      UHT6: 10
+    }
   }
 ];
