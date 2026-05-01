@@ -38,7 +38,7 @@ body {
   background:#334155;
 }
 
-/* ================= SIDEBAR ================= */
+/* ================= SIDEBAR (FIXED) ================= */
 .sidebar {
   width:240px;
   min-width:240px;
@@ -46,12 +46,31 @@ body {
   background:#020617;
   padding:20px;
   border-right:2px solid #1e293b;
+
   transition: transform 0.3s ease;
   transform: translateX(0);
+
+  position: relative;
+  z-index: 20;
 }
 
 .sidebar.hidden {
   transform: translateX(-100%);
+  pointer-events: none;
+}
+
+/* ================= MOBILE FIX ================= */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 30;
+  }
+
+  .main {
+    width: 100%;
+  }
 }
 
 /* ================= TITLE ================= */
@@ -161,7 +180,7 @@ body {
   100% { left:120%; }
 }
 
-/* ================= BORDER SYSTEM (RESTORED) ================= */
+/* ================= BORDER SYSTEM ================= */
 .family-card::before {
   content:"";
   position:absolute;
@@ -219,7 +238,7 @@ body {
   color:white;
 }
 
-/* ================= BADGES (RESTORED) ================= */
+/* ================= BADGES ================= */
 .badge {
   font-size:11px;
   padding:4px 10px;
@@ -294,28 +313,24 @@ img {
 
 <body>
 
-<!-- TOGGLE -->
 <button id="toggleSidebarBtn" onclick="toggleSidebar()">☰</button>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
-
   <h2>
     Doodle World Value Index<br>
     <span style="opacity:0.6; font-size:12px;">by janitoess</span>
   </h2>
 
-  <button onclick="setFilter('all', this)" class="active">All</button>
-  <button onclick="setFilter('rising', this)">Rising</button>
-  <button onclick="setFilter('high', this)">High</button>
-  <button onclick="setFilter('hype', this)">Hype</button>
+  <button class="active">All</button>
+  <button>Rising</button>
+  <button>High</button>
+  <button>Hype</button>
 
   <hr style="border:1px solid #1e293b; margin:12px 0;">
 
-  <button onclick="sortAZ()">Sort: A → Z</button>
+  <button>Sort: A → Z</button>
 </div>
 
-<!-- MAIN -->
 <div class="main">
   <div class="grid" id="grid"></div>
 </div>
@@ -325,11 +340,8 @@ img {
 <script>
 const grid = document.getElementById("grid");
 
-let activeFilter = "all";
-let activeBtn = null;
 let sidebarOpen = true;
 
-/* TOGGLE */
 function toggleSidebar(){
   const sidebar = document.querySelector(".sidebar");
   const btn = document.getElementById("toggleSidebarBtn");
@@ -347,25 +359,6 @@ function toggleSidebar(){
   }
 }
 
-/* FILTER */
-function setFilter(f, btn){
-  activeFilter = f;
-  render();
-
-  if(activeBtn) activeBtn.classList.remove("active");
-  if(btn){
-    btn.classList.add("active");
-    activeBtn = btn;
-  }
-}
-
-/* SORT */
-function sortAZ(){
-  doodles.sort((a,b) => a.name.localeCompare(b.name));
-  render();
-}
-
-/* RENDER */
 function render(){
   grid.innerHTML = "";
 
