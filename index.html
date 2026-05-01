@@ -54,7 +54,7 @@ body {
   transform: translateX(-100%);
 }
 
-/* ================= TITLE ================= */
+/* ================= TITLE (UPDATED) ================= */
 .sidebar h2 {
   color:white;
   margin-bottom:14px;
@@ -63,7 +63,7 @@ body {
   line-height:1.2;
 }
 
-/* ================= PREMIUM BUTTONS ================= */
+/* ================= PREMIUM FILTER BUTTONS ================= */
 .sidebar button {
   width:100%;
   margin-bottom:10px;
@@ -88,7 +88,6 @@ body {
     0 6px 18px rgba(0,0,0,0.25);
 }
 
-/* hover */
 .sidebar button:hover {
   transform:translateX(6px) scale(1.02);
   background:linear-gradient(145deg,#334155,#1e293b);
@@ -97,7 +96,6 @@ body {
     0 0 12px rgba(59,130,246,0.15);
 }
 
-/* active */
 .sidebar button.active {
   background:linear-gradient(145deg,#334155,#1e293b);
   box-shadow:
@@ -163,14 +161,13 @@ body {
   100% { left:120%; }
 }
 
-/* borders */
+/* ================= BORDER ================= */
 .family-card::before {
   content:"";
   position:absolute;
   inset:0;
   padding:2px;
   border-radius:14px;
-
   background:linear-gradient(135deg,#60a5fa,#1e3a8a);
 
   -webkit-mask:
@@ -278,8 +275,10 @@ img {
 
 <!-- SIDEBAR -->
 <div class="sidebar">
+
+  <!-- ✅ UPDATED TITLE -->
   <h2>
-    Doodle World Value Index <br>
+    Doodle World Value Index<br>
     <span style="opacity:0.6; font-size:12px;">by janitoess</span>
   </h2>
 
@@ -307,7 +306,7 @@ let activeFilter = "all";
 let activeBtn = null;
 let sidebarOpen = true;
 
-/* TOGGLE */
+/* TOGGLE SIDEBAR */
 function toggleSidebar(){
   const sidebar = document.querySelector(".sidebar");
   const btn = document.getElementById("toggleSidebarBtn");
@@ -343,71 +342,17 @@ function sortAZ(){
   render();
 }
 
-/* COLOR */
-function getColor(v){
-  if(v <= 5) return "value-low";
-  if(v <= 10) return "value-mid";
-  return "value-high";
-}
-
 /* RENDER */
 function render(){
   grid.innerHTML = "";
 
-  let list = [...doodles];
-
-  list = list.filter(d => {
-    const v = d.values.UHT6;
-
-    if(activeFilter === "rising") return d.trend === "up";
-    if(activeFilter === "high") return v > 10 && v <= 15;
-    if(activeFilter === "hype") return v > 15;
-
-    return true;
-  });
-
-  list.forEach(d => {
-
-    const v = d.values.UHT6;
-
-    let tier = "low";
-    let badgeText = "LOW DEMAND";
-
-    if (v <= 5) {
-      tier = "low";
-    } else if (v <= 10) {
-      tier = "mid";
-      badgeText = "MID DEMAND";
-    } else if (v <= 15) {
-      tier = "high";
-      badgeText = "HIGH DEMAND";
-    } else {
-      tier = "hype";
-      badgeText = "HYPE DEMAND";
-    }
-
-    let glow = "glow-low";
-    if (v > 5) glow = "glow-mid";
-    if (v > 10) glow = "glow-high";
-    if (v > 15) glow = "glow-hype";
-
-    if (d.trend === "up") {
-      if (glow === "glow-low") glow = "glow-mid";
-      else if (glow === "glow-mid") glow = "glow-high";
-      else glow = "glow-hype";
-    }
-
+  doodles.forEach(d => {
     const card = document.createElement("div");
-    card.className = `family-card ${tier} ${glow}`;
+    card.className = "family-card";
 
     card.innerHTML = `
       <div class="family-header">
-        <div>${d.name}
-          <span style="margin-left:6px; font-size:11px; opacity:0.7;">
-            ${d.trend.toUpperCase()}
-          </span>
-        </div>
-        <div class="badge ${tier}">${badgeText}</div>
+        <div>${d.name}</div>
       </div>
 
       <img src="${d.image}">
