@@ -40,6 +40,28 @@ body {
   text-align:left;
 }
 
+/* search */
+.sidebar input {
+  width:100%;
+  padding:10px;
+  margin:10px 0 12px 0;
+  border-radius:10px;
+  border:none;
+  outline:none;
+  background:#1e293b;
+  color:white;
+}
+
+/* sort */
+.sidebar select {
+  width:100%;
+  padding:10px;
+  border-radius:10px;
+  background:#1e293b;
+  color:white;
+  border:none;
+}
+
 /* ================= MAIN ================= */
 .main {
   flex:1;
@@ -65,11 +87,10 @@ body {
   transition:transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* hover focus effect (clean, no layout shift) */
+/* hover expand */
 .family-card:hover {
   transform:scale(1.04);
   z-index:10;
-  box-shadow:0 12px 35px rgba(0,0,0,0.5);
 }
 
 /* ================= SHIMMER ================= */
@@ -98,7 +119,7 @@ body {
   100% { left:120%; }
 }
 
-/* ================= BORDER OUTLINE ================= */
+/* ================= BORDER ================= */
 .family-card::before {
   content:"";
   position:absolute;
@@ -145,6 +166,23 @@ body {
   100% { background-position:0% 50%; }
 }
 
+/* ================= GLOW SYSTEM ================= */
+.glow-low {
+  box-shadow:0 0 10px rgba(96,165,250,0.15);
+}
+
+.glow-mid {
+  box-shadow:0 0 14px rgba(74,222,128,0.18);
+}
+
+.glow-high {
+  box-shadow:0 0 18px rgba(250,204,21,0.22);
+}
+
+.glow-hype {
+  box-shadow:0 0 25px rgba(248,113,113,0.35);
+}
+
 /* ================= HEADER ================= */
 .family-header {
   display:flex;
@@ -161,31 +199,13 @@ body {
   font-weight:bold;
 }
 
-.badge.low {
-  background:rgba(96,165,250,0.15);
-  color:#60a5fa;
-}
-
-.badge.mid {
-  background:rgba(74,222,128,0.15);
-  color:#4ade80;
-}
-
-.badge.high {
-  background:rgba(250,204,21,0.15);
-  color:#facc15;
-}
+.badge.low { background:rgba(96,165,250,0.15); color:#60a5fa; }
+.badge.mid { background:rgba(74,222,128,0.15); color:#4ade80; }
+.badge.high { background:rgba(250,204,21,0.15); color:#facc15; }
 
 .badge.hype {
   background:rgba(248,113,113,0.15);
   color:#f87171;
-  animation:pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% { box-shadow:0 0 0 rgba(248,113,113,0); }
-  50% { box-shadow:0 0 12px rgba(248,113,113,0.7); }
-  100% { box-shadow:0 0 0 rgba(248,113,113,0); }
 }
 
 /* ================= IMAGE ================= */
@@ -195,7 +215,7 @@ img {
   margin-top:10px;
 }
 
-/* ================= EXPAND (ONLY HOVERED CARD) ================= */
+/* ================= EXPAND ================= */
 .family-content {
   max-height:0;
   overflow:hidden;
@@ -217,7 +237,6 @@ img {
 /* ================= VALUES ================= */
 .values div {
   padding:2px 0;
-  transition:0.2s;
   color:#e2e8f0;
 }
 
@@ -237,10 +256,22 @@ img {
 <!-- SIDEBAR -->
 <div class="sidebar">
   <h3 style="color:white;">Filters</h3>
-  <button>All</button>
-  <button>Rising</button>
-  <button>High</button>
-  <button>Hype</button>
+
+  <input id="search" placeholder="Search doodles...">
+
+  <button onclick="setFilter('all')">All</button>
+  <button onclick="setFilter('rising')">Rising</button>
+  <button onclick="setFilter('high')">High</button>
+  <button onclick="setFilter('hype')">Hype</button>
+
+  <hr style="border:1px solid #1e293b; margin:12px 0;">
+
+  <select id="sort">
+    <option value="default">Sort: Default</option>
+    <option value="valueHigh">UHT6 High → Low</option>
+    <option value="valueLow">UHT6 Low → High</option>
+    <option value="name">Name A → Z</option>
+  </select>
 </div>
 
 <!-- MAIN -->
@@ -253,16 +284,72 @@ img {
 <script>
 const grid = document.getElementById("grid");
 
+let activeFilter = "all";
+let searchQuery = "";
+let sortMode = "default";
+
+/* SEARCH */
+document.getElementById("search").addEventListener("input", e => {
+  searchQuery = e.target.value.toLowerCase();
+  render();
+});
+
+/* SORT */
+document.getElementById("sort").addEventListener("change", e => {
+  sortMode = e.target.value;
+  render();
+});
+
+/* FILTER */
+function setFilter(f){
+  activeFilter = f;
+  render();
+}
+
+/* VALUE COLOR */
 function getColor(v){
   if(v <= 5) return "value-low";
   if(v <= 10) return "value-mid";
   return "value-high";
 }
 
+/* RENDER */
 function render(){
   grid.innerHTML = "";
 
-  doodles.forEach(d => {
+  let list = [...doodles];
+
+  /* SEARCH */
+  if(searchQuery){
+    list = list.filter(d =>
+      d.name.toLowerCase().includes(searchQuery)
+    );
+  }
+
+  /* FILTER */
+  list = list.filter(d => {
+    const v = d.values.UHT6;
+
+    if(activeFilter === "rising") return d.trend === "up";
+    if(activeFilter === "high") return v > 10 && v <= 15;
+    if(activeFilter === "hype") return v > 15;
+
+    return true;
+  });
+
+  /* SORT */
+  if(sortMode === "valueHigh"){
+    list.sort((a,b) => b.values.UHT6 - a.values.UHT6);
+  }
+  if(sortMode === "valueLow"){
+    list.sort((a,b) => a.values.UHT6 - b.values.UHT6);
+  }
+  if(sortMode === "name"){
+    list.sort((a,b) => a.name.localeCompare(b.name));
+  }
+
+  /* CARDS */
+  list.forEach(d => {
 
     const v = d.values.UHT6;
 
@@ -271,28 +358,40 @@ function render(){
 
     if (v <= 5) {
       tier = "low";
-      badgeText = "LOW DEMAND";
     } else if (v <= 10) {
       tier = "mid";
-      badgeText = "MID DEMAND";
     } else if (v <= 15) {
       tier = "high";
-      badgeText = "HIGH DEMAND";
     } else {
       tier = "hype";
-      badgeText = "🔥 HYPE / HOT";
+    }
+
+    /* GLOW INTENSITY */
+    let glow = "glow-low";
+
+    if (v > 5) glow = "glow-mid";
+    if (v > 10) glow = "glow-high";
+    if (v > 15) glow = "glow-hype";
+
+    if (d.trend === "up") {
+      if (glow === "glow-low") glow = "glow-mid";
+      else if (glow === "glow-mid") glow = "glow-high";
+      else glow = "glow-hype";
     }
 
     const card = document.createElement("div");
-    card.className = `family-card ${tier}`;
+    card.className = `family-card ${tier} ${glow}`;
 
     card.innerHTML = `
       <div class="family-header">
-        <div>${d.name}</div>
-        <div class="badge ${tier}">${badgeText}</div>
+        <div>${d.name}
+          <span style="margin-left:6px;">
+            ${d.trend === "up" ? "📈" : d.trend === "down" ? "📉" : "➖"}
+          </span>
+        </div>
       </div>
 
-      <img src="${d.image}" onerror="this.src='https://via.placeholder.com/200'">
+      <img src="${d.image}">
 
       <div class="family-content">
         <div class="forms">
