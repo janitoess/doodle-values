@@ -1,157 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Doodle Value Index</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
 <style>
-* {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Inter;
-}
-
 body {
-  display:flex;
-  height:100vh;
-  background: radial-gradient(circle at top, #0f172a, #020617);
+  margin:0;
+  font-family:Arial;
+  background:#0f172a;
   color:white;
-  overflow:hidden;
+  display:flex;
 }
 
 /* SIDEBAR */
 .sidebar {
   width:260px;
-  background:#0b1220;
+  background:#020617;
   padding:20px;
-  border-right:1px solid rgba(255,255,255,0.05);
 }
 
-.sidebar h2 {
-  margin-bottom:20px;
-}
-
-.group-btn {
+button {
   width:100%;
+  margin-bottom:8px;
   padding:10px;
-  margin-bottom:10px;
   border:none;
-  border-radius:10px;
-  background:#111827;
-  color:#94a3b8;
-  cursor:pointer;
-  text-align:left;
-  transition:0.2s;
-}
-
-.group-btn:hover,
-.group-btn.active {
+  border-radius:8px;
   background:#1e293b;
   color:white;
-  transform:translateX(3px);
+  cursor:pointer;
 }
 
 /* MAIN */
 .main {
   flex:1;
-  padding:25px;
-  overflow-y:auto;
+  padding:20px;
 }
 
-.topbar {
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:20px;
-}
-
-input {
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #1e293b;
-  background:#020617;
-  color:white;
-  width:240px;
-}
-
-/* GRID */
 .grid {
   display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
-  gap:18px;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:15px;
 }
 
 /* CARD */
 .card {
-  background: linear-gradient(145deg, #1e293b, #0f172a);
-  border:1px solid rgba(255,255,255,0.05);
-  border-radius:18px;
-  padding:15px;
+  background:#1e293b;
+  padding:12px;
+  border-radius:12px;
   position:relative;
-  transition:0.25s;
-  animation:fadeUp 0.4s ease forwards;
-  opacity:0;
-  transform:translateY(10px);
-  overflow:hidden;
+  transition:.2s;
 }
 
-.card:hover {
-  transform:translateY(-6px) scale(1.02);
-}
+.card:hover { transform:scale(1.03); }
 
 /* TIERS */
-.low { box-shadow:0 0 10px rgba(59,130,246,0.15); }
-.mid { box-shadow:0 0 15px rgba(34,197,94,0.2); }
-.high { box-shadow:0 0 20px rgba(234,179,8,0.25); }
-.hype {
-  box-shadow:0 0 25px rgba(239,68,68,0.35);
-  animation:pulse 2s infinite;
-}
+.low { box-shadow:0 0 10px rgba(59,130,246,0.2); }
+.mid { box-shadow:0 0 10px rgba(34,197,94,0.2); }
+.high { box-shadow:0 0 10px rgba(234,179,8,0.2); }
+.hype { box-shadow:0 0 20px rgba(239,68,68,0.4); }
 
-@keyframes pulse {
-  0% { box-shadow:0 0 15px rgba(239,68,68,0.25); }
-  50% { box-shadow:0 0 28px rgba(239,68,68,0.45); }
-  100% { box-shadow:0 0 15px rgba(239,68,68,0.25); }
-}
-
-/* IMAGE */
-img {
-  width:100%;
-  border-radius:12px;
-  margin-bottom:10px;
-}
-
-/* BADGE */
-.badge {
+/* FAVORITE */
+.star {
   position:absolute;
-  top:10px;
-  right:10px;
-  padding:5px 8px;
-  font-size:11px;
+  top:8px;
+  left:8px;
+  cursor:pointer;
+}
+
+/* TOP BAR */
+.topbar {
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+input {
+  padding:8px;
   border-radius:8px;
-  background:#0f172a;
-  border:1px solid rgba(255,255,255,0.1);
+  border:none;
 }
 
-/* TEXT */
-.value {
-  font-size:18px;
-  font-weight:700;
-  margin-top:6px;
-}
-
-.tag {
-  font-size:12px;
-  opacity:0.7;
-  margin-top:5px;
-}
-
-/* ANIMATION */
-@keyframes fadeUp {
-  to { opacity:1; transform:translateY(0); }
+/* TRADE BOX */
+.trade {
+  margin-top:20px;
+  padding:15px;
+  background:#020617;
+  border-radius:10px;
 }
 </style>
 </head>
@@ -159,118 +95,140 @@ img {
 <body>
 
 <div class="sidebar">
-  <h2>Value Index</h2>
-
-  <button class="group-btn active" onclick="setGroup('all', this)">All</button>
-  <button class="group-btn" onclick="setGroup('Swarms', this)">Swarms</button>
-  <button class="group-btn" onclick="setGroup('Mythics', this)">Mythics</button>
-  <button class="group-btn" onclick="setGroup('Event Exclusive', this)">Event Exclusive</button>
-  <button class="group-btn" onclick="setGroup('Other', this)">Other</button>
+  <h3>Filters</h3>
+  <button onclick="setFilter('all')">All</button>
+  <button onclick="setFilter('rising')">⬆️ Rising</button>
+  <button onclick="setFilter('high')">🔥 High Demand</button>
+  <button onclick="setFilter('hype')">🚨 Hype</button>
+  <button onclick="setFilter('fav')">⭐ Favorites</button>
 </div>
 
 <div class="main">
 
-  <div class="topbar">
-    <h2 id="title">All Doodles</h2>
-    <input id="search" placeholder="Search..." />
-  </div>
+<div class="topbar">
+  <input id="search" placeholder="Search...">
+</div>
 
-  <div class="grid" id="grid"></div>
+<div class="grid" id="grid"></div>
+
+<div class="trade">
+  <h3>Trade Calculator</h3>
+  <input id="d1" placeholder="Doodle 1">
+  <input id="d2" placeholder="Doodle 2">
+  <button onclick="compare()">Compare</button>
+  <p id="result"></p>
+</div>
 
 </div>
 
 <script src="data.js"></script>
 
 <script>
-let activeGroup = "all";
+let filterType = "all";
+let favorites = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
-const search = document.getElementById("search");
-const title = document.getElementById("title");
 
-/* TIER SYSTEM */
-function getTier(value){
-  if(value <= 20) return "low";
-  if(value <= 200) return "mid";
-  if(value <= 1000) return "high";
+/* SYSTEMS */
+function getTier(v){
+  if(v<=20) return "low";
+  if(v<=200) return "mid";
+  if(v<=1000) return "high";
   return "hype";
 }
 
-/* DEMAND LABEL */
-function getBadge(value){
-  if(value <= 20) return "LOW DEMAND";
-  if(value <= 200) return "MID DEMAND";
-  if(value <= 1000) return "HIGH DEMAND";
-  return "HYPE / OVERPAID";
+function trendIcon(t){
+  if(t==="up") return "⬆️";
+  if(t==="down") return "⬇️";
+  return "➡️";
 }
 
-/* TREND SYSTEM */
-function getTrend(trend){
-  if(trend === "up") return "⬆️ Rising";
-  if(trend === "down") return "⬇️ Dropping";
-  return "➡️ Stable";
+/* LIVE VALUE MOVEMENT */
+function fluctuate(){
+  doodles.forEach(d=>{
+    let change = Math.floor(Math.random()*3)-1;
+    d.value = Math.max(1, d.value + change);
+  });
+  render();
+}
+setInterval(fluctuate, 4000);
+
+/* FAVORITES */
+function toggleFav(name){
+  if(favorites.includes(name)){
+    favorites = favorites.filter(f=>f!==name);
+  } else {
+    favorites.push(name);
+  }
+  localStorage.setItem("fav", JSON.stringify(favorites));
+  render();
 }
 
-function render(list){
-  grid.innerHTML = "";
+/* RENDER */
+function render(){
+  const term = document.getElementById("search").value.toLowerCase();
 
-  list.forEach((d,i) => {
-    const tier = getTier(d.value);
-    const badge = getBadge(d.value);
+  grid.innerHTML="";
 
-    const card = document.createElement("div");
-    card.className = `card ${tier}`;
-    card.style.animationDelay = (i * 0.03) + "s";
+  doodles.forEach(d=>{
+    if(term && !d.name.toLowerCase().includes(term)) return;
 
-    card.innerHTML = `
-      <div class="badge">${badge}</div>
+    if(filterType==="rising" && d.trend!=="up") return;
+    if(filterType==="high" && d.value<200) return;
+    if(filterType==="hype" && d.value<1000) return;
+    if(filterType==="fav" && !favorites.includes(d.name)) return;
+
+    const card=document.createElement("div");
+    card.className="card "+getTier(d.value);
+
+    card.innerHTML=`
+      <div class="star" onclick="toggleFav('${d.name}')">
+        ${favorites.includes(d.name) ? "⭐" : "☆"}
+      </div>
 
       <img src="${d.image}" 
-      onerror="this.src='https://via.placeholder.com/300x180?text=Doodle+Image'" />
+      onerror="this.src='https://via.placeholder.com/200'">
 
-      <h3>${d.name}</h3>
-
-      <div class="value">💰 ${d.value}</div>
-
-      <div class="tag">📦 ${d.group}</div>
-
-      <div class="tag">${getTrend(d.trend)}</div>
+      <h4>${d.name}</h4>
+      <p>💰 ${d.value}</p>
+      <p>${trendIcon(d.trend)}</p>
     `;
 
     grid.appendChild(card);
   });
 }
 
-function filter(){
-  const term = search.value.toLowerCase();
-
-  const filtered = doodles.filter(d => {
-    const matchGroup = activeGroup === "all" || d.group === activeGroup;
-
-    const matchSearch =
-      d.name.toLowerCase().includes(term) ||
-      d.forms.some(f => f.toLowerCase().includes(term));
-
-    return matchGroup && matchSearch;
-  });
-
-  render(filtered);
+/* FILTER */
+function setFilter(f){
+  filterType=f;
+  render();
 }
 
-function setGroup(group, el){
-  activeGroup = group;
+/* TRADE CALCULATOR */
+function compare(){
+  const a = doodles.find(d=>d.name.toLowerCase().includes(document.getElementById("d1").value.toLowerCase()));
+  const b = doodles.find(d=>d.name.toLowerCase().includes(document.getElementById("d2").value.toLowerCase()));
 
-  document.querySelectorAll(".group-btn").forEach(b => b.classList.remove("active"));
-  el.classList.add("active");
+  if(!a || !b){
+    document.getElementById("result").innerText="Invalid input";
+    return;
+  }
 
-  title.innerText = group === "all" ? "All Doodles" : group;
+  let diff = a.value - b.value;
 
-  filter();
+  if(Math.abs(diff) <= 5) return result("Fair Trade");
+  if(diff > 5) return result("Win");
+  return result("Loss");
 }
 
-search.addEventListener("input", filter);
+function result(text){
+  document.getElementById("result").innerText=text;
+}
 
-render(doodles);
+/* INIT */
+document.getElementById("search").addEventListener("input", render);
+
+render();
 </script>
 
 </body>
