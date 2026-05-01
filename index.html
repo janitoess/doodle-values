@@ -14,13 +14,12 @@ html, body {
   font-family:Arial;
 }
 
-/* 🔥 SIMPLE RELIABLE LAYOUT (NO GRID WRAPPER BUGS) */
+/* layout */
 body {
   display:flex;
-  flex-direction:row;
 }
 
-/* ================= SIDEBAR ================= */
+/* sidebar */
 .sidebar {
   width:240px;
   min-width:240px;
@@ -28,14 +27,6 @@ body {
   background:#020617;
   padding:20px;
   border-right:2px solid #1e293b;
-  position:sticky;
-  top:0;
-  z-index:9999;
-}
-
-.sidebar h3 {
-  color:white;
-  margin-bottom:12px;
 }
 
 .sidebar button {
@@ -48,109 +39,32 @@ body {
   color:white;
   cursor:pointer;
   text-align:left;
-  transition:0.2s;
 }
 
-.sidebar button:hover {
-  background:#334155;
-  transform:translateX(3px);
-}
-
-/* ================= MAIN ================= */
+/* main */
 .main {
   flex:1;
   padding:20px;
   overflow-y:auto;
 }
 
-/* ================= GRID ================= */
+/* grid */
 .grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
   gap:15px;
 }
 
-/* ================= CARD ================= */
+/* card */
 .family-card {
-  position:relative;
+  background:#1e293b;
   border-radius:14px;
   padding:12px;
-  background:#1e293b;
-  overflow:hidden;
   cursor:pointer;
-  transition:0.2s;
+  position:relative;
 }
 
-.family-card:hover {
-  transform:scale(1.02);
-}
-
-/* SHIMMER */
-.family-card::after {
-  content:"";
-  position:absolute;
-  top:0;
-  left:-120%;
-  width:60%;
-  height:100%;
-  background:linear-gradient(
-    120deg,
-    transparent 0%,
-    rgba(255,255,255,0.06) 45%,
-    rgba(255,255,255,0.14) 50%,
-    rgba(255,255,255,0.06) 55%,
-    transparent 100%
-  );
-  transform:skewX(-20deg);
-  animation: shimmer 5s infinite;
-  pointer-events:none;
-}
-
-@keyframes shimmer {
-  0% { left:-120%; }
-  100% { left:120%; }
-}
-
-/* BORDER */
-.family-card::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  padding:2px;
-  border-radius:14px;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;
-  mask-composite:exclude;
-  pointer-events:none;
-}
-
-.family-card.low::before {
-  background:linear-gradient(135deg,#60a5fa,#1e3a8a);
-}
-
-.family-card.mid::before {
-  background:linear-gradient(135deg,#4ade80,#14532d);
-}
-
-.family-card.high::before {
-  background:linear-gradient(135deg,#facc15,#92400e);
-}
-
-.family-card.hype::before {
-  background:linear-gradient(270deg,#f87171,#fb7185,#f97316);
-  background-size:400% 400%;
-  animation:hypeBorder 3s ease infinite;
-}
-
-@keyframes hypeBorder {
-  0% { background-position:0% 50%; }
-  50% { background-position:100% 50%; }
-  100% { background-position:0% 50%; }
-}
-
-/* HEADER */
+/* header */
 .family-header {
   display:flex;
   justify-content:space-between;
@@ -158,78 +72,68 @@ body {
   color:white;
 }
 
-/* BADGE */
-.badge {
-  font-size:11px;
-  padding:4px 10px;
-  border-radius:999px;
-}
-
-.badge.low { background:rgba(96,165,250,0.15); color:#60a5fa; }
-.badge.mid { background:rgba(74,222,128,0.15); color:#4ade80; }
-.badge.high { background:rgba(250,204,21,0.15); color:#facc15; }
-.badge.hype {
-  background:rgba(248,113,113,0.15);
-  color:#f87171;
-  animation:badgePulse 1.5s infinite;
-}
-
-@keyframes badgePulse {
-  0% { box-shadow:0 0 0 rgba(248,113,113,0); }
-  50% { box-shadow:0 0 14px rgba(248,113,113,0.7); }
-  100% { box-shadow:0 0 0 rgba(248,113,113,0); }
-}
-
-/* IMAGE */
+/* image */
 img {
   width:100%;
   border-radius:8px;
   margin-top:10px;
 }
 
-/* EXPAND */
+/* expand */
 .family-content {
   max-height:0;
-  opacity:0;
   overflow:hidden;
-  transform:translateY(-5px);
-  transition:0.25s ease;
+  transition:0.3s;
+  opacity:0;
 }
 
 .family-card.open .family-content {
   max-height:500px;
   opacity:1;
-  transform:translateY(0);
 }
 
-.family-card:hover .family-content {
-  max-height:500px;
-  opacity:0.85;
-}
-
+/* forms */
 .forms {
-  margin-top:6px;
   color:#93c5fd;
+  margin-top:6px;
 }
 
+/* ================= VALUE COLORS ================= */
 .values div {
   padding:2px 0;
+  transition:0.2s;
+  color:#e2e8f0;
+}
+
+.value-low {
+  color:#f87171;
+}
+
+.value-mid {
+  color:#facc15;
+}
+
+.value-high {
+  color:#4ade80;
+}
+
+.values div:hover {
+  color:#ffffff;
+  transform:translateX(2px);
 }
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
-  <h3>Filters</h3>
-  <button onclick="setFilter('all')">All</button>
-  <button onclick="setFilter('rising')">Rising</button>
-  <button onclick="setFilter('high')">High</button>
-  <button onclick="setFilter('hype')">Hype</button>
+  <h3 style="color:white;">Filters</h3>
+  <button>All</button>
+  <button>Rising</button>
+  <button>High</button>
+  <button>Hype</button>
 </div>
 
-<!-- MAIN -->
 <div class="main">
   <div class="grid" id="grid"></div>
 </div>
@@ -238,42 +142,24 @@ img {
 
 <script>
 const grid = document.getElementById("grid");
-let activeFilter = "all";
 
-function getBadge(d){
-  const v = d.values.UHT6;
-  if(v <= 5) return { label:"LOW DEMAND", tier:"low" };
-  if(v <= 10) return { label:"MID DEMAND", tier:"mid" };
-  if(v <= 15) return { label:"HIGH DEMAND", tier:"high" };
-  return { label:"🔥 HYPE / HOT", tier:"hype" };
-}
-
-function toggle(card){
-  card.classList.toggle("open");
-}
-
-function setFilter(f){
-  activeFilter = f;
-  render();
+function getColor(v){
+  if(v <= 5) return "value-low";
+  if(v <= 10) return "value-mid";
+  return "value-high";
 }
 
 function render(){
   grid.innerHTML = "";
 
   doodles.forEach(d => {
-    const badge = getBadge(d);
-
-    if(activeFilter === "rising" && d.trend !== "up") return;
-    if(activeFilter === "high" && d.values.UHT6 < 10) return;
-    if(activeFilter === "hype" && d.values.UHT6 < 15) return;
 
     const card = document.createElement("div");
-    card.className = `family-card ${badge.tier}`;
+    card.className = "family-card";
 
     card.innerHTML = `
       <div class="family-header">
         <div>${d.name}</div>
-        <div class="badge ${badge.tier}">${badge.label}</div>
       </div>
 
       <img src="${d.image}" onerror="this.src='https://via.placeholder.com/200'">
@@ -284,12 +170,16 @@ function render(){
         </div>
 
         <div class="values">
-          ${Object.entries(d.values).map(([k,v]) => `<div>${k}: ${v}</div>`).join("")}
+          ${Object.entries(d.values).map(([k,v]) => `
+            <div class="${getColor(v)}">${k}: ${v}</div>
+          `).join("")}
         </div>
       </div>
     `;
 
-    card.addEventListener("click", () => toggle(card));
+    card.addEventListener("click", () => {
+      card.classList.toggle("open");
+    });
 
     grid.appendChild(card);
   });
