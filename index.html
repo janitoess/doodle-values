@@ -16,6 +16,7 @@ html, body {
 
 body {
   display:flex;
+  overflow-x:hidden;
 }
 
 /* ================= SIDEBAR ================= */
@@ -23,19 +24,32 @@ body {
   width:240px;
   min-width:240px;
   height:100vh;
-  background:#020617;
+  background: rgba(2, 6, 23, 0.92);
+  backdrop-filter: blur(10px);
+
   padding:20px;
   border-right:2px solid #1e293b;
 
-  transition: transform 0.3s ease;
-  transform: translateX(0);
-
   position: relative;
   z-index:20;
+
+  /* smooth entrance/exit */
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform 0.35s ease, opacity 0.25s ease;
 }
 
+/* 🔥 GLASS FADE EXIT */
 .sidebar.hidden {
-  transform: translateX(-100%);
+  transform: translateX(-12%);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+/* safety fix so hidden sidebar never blocks clicks */
+.sidebar.hidden * {
+  pointer-events: none;
 }
 
 /* ================= FLOATING GRIP HANDLE ================= */
@@ -70,18 +84,18 @@ body {
   box-shadow: 6px 0 20px rgba(0,0,0,0.4);
 
   transition:
-    left 0.3s ease,
+    left 0.35s ease,
     transform 0.2s ease,
     box-shadow 0.3s ease;
 }
 
-/* grip lines (≡) */
+/* grip lines */
 #toggleSidebarBtn .grip {
   width: 14px;
   height: 2px;
   background: rgba(255,255,255,0.6);
   border-radius: 2px;
-  opacity:0.7;
+  opacity:0.75;
 }
 
 /* pulse glow */
@@ -90,9 +104,7 @@ body {
   position:absolute;
   inset:0;
   border-radius: inherit;
-  box-shadow: 0 0 0 rgba(99,102,241,0);
-  animation: pulseGlow 2.5s infinite;
-  pointer-events:none;
+  animation: pulseGlow 2.6s infinite;
 }
 
 @keyframes pulseGlow {
@@ -101,24 +113,20 @@ body {
   100% { box-shadow: 0 0 0 rgba(99,102,241,0); }
 }
 
-/* hover pop-out */
+/* hover pop */
 #toggleSidebarBtn:hover {
-  transform: translateY(-50%) translateX(4px) scale(1.05);
-  box-shadow: 10px 0 24px rgba(0,0,0,0.55);
+  transform: translateY(-50%) translateX(5px) scale(1.05);
 }
 
-/* when sidebar hidden */
+/* when hidden */
 body.sidebar-hidden #toggleSidebarBtn {
   left: 10px;
   border-radius: 14px;
 }
 
-/* ================= MOBILE ================= */
-@media (max-width: 768px) {
-  #toggleSidebarBtn {
-    top: 65%;
-    height: 100px;
-  }
+/* ================= INPUT FIX ================= */
+* {
+  box-sizing: border-box;
 }
 
 /* ================= TITLE ================= */
