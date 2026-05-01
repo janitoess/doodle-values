@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doodle World Values</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #020617, #0f172a);
+      color: #e2e8f0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 230px;
+      background: rgba(15, 23, 42, 0.95);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border-right: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav button {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      padding: 10px;
+      text-align: left;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav button.active,
+    .nav button:hover {
+      background: #1e293b;
+      color: white;
+    }
+
+    .main {
+      flex: 1;
+      padding: 25px;
+      overflow-y: auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 25px;
+    }
+
+    input {
+      background: #020617;
+      border: 1px solid #1e293b;
+      padding: 10px;
+      border-radius: 10px;
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 15px;
+      transition: all 0.25s ease;
+      transform: translateY(10px);
+      opacity: 0;
+      animation: fadeUp 0.4s forwards;
+    }
+
+    .card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+
+    @keyframes fadeUp {
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .value {
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    .trend {
+      margin-top: 6px;
+      font-size: 13px;
+      opacity: 0.8;
+    }
+
+    .evo {
+      margin-top: 10px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .tab { display: none; }
+    .tab.active { display: block; }
+
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">Doodle Values</div>
+
+  <div class="nav">
+    <button class="active" onclick="switchTab('values', this)">Values</button>
+    <button onclick="switchTab('about', this)">About</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="topbar">
+    <h2 id="title">Values</h2>
+    <input type="text" id="search" placeholder="Search doodles...">
+  </div>
+
+  <div id="values" class="tab active">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div id="about" class="tab">
+    <p>Doodles are grouped by value categories. Evolution lines share the same value group.</p>
+  </div>
+
+</div>
+
+<script>
+
+const valueGroups = {
+  swarm: {
+    name: "Swarm Doodles",
+    value: 10,
+    trend: "Stable"
+  },
+  legendary: {
+    name: "Legendary Line",
+    value: 2500,
+    trend: "High Demand"
+  }
+};
+
+const data = [
+  {
+    evolutionLine: "Beetle Line",
+    forms: ["Beetle", "Beetle Evo"],
+    group: "swarm"
+  },
+  {
+    evolutionLine: "Fly Line",
+    forms: ["Fly", "Fly Evo"],
+    group: "swarm"
+  },
+  {
+    evolutionLine: "Chronos Line",
+    forms: ["Chronos"],
+    group: "legendary"
+  }
+];
+
+const grid = document.getElementById("grid");
+const search = document.getElementById("search");
+
+function render(items) {
+  grid.innerHTML = "";
+
+  items.forEach((item, i) => {
+    const group = valueGroups[item.group];
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.animationDelay = i * 0.05 + "s";
+
+    card.innerHTML = `
+      <h2>${item.evolutionLine}</h2>
+      <div class="value">${group.value}</div>
+      <div class="trend">${group.trend}</div>
+      <div class="evo">Forms: ${item.forms.join(", ")}</div>
+      <div class="evo">Group: ${group.name}</div>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+search.addEventListener("input", () => {
+  const term = search.value.toLowerCase();
+
+  const filtered = data.filter(d => {
+    const group = valueGroups[d.group];
+
+    return (
+      d.evolutionLine.toLowerCase().includes(term) ||
+      d.forms.some(f => f.toLowerCase().includes(term)) ||
+      group.name.toLowerCase().includes(term)
+    );
+  });
+
+  render(filtered);
+});
+
+function switchTab(tabId, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+
+  document.getElementById('title').innerText = el.innerText;
+}
+
+render(data);
+
+</script>
+
+</body>
+</html>
