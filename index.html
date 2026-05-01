@@ -23,13 +23,19 @@ body {
   position:fixed;
   top:15px;
   left:15px;
-  z-index:999;
+  z-index:9999;
   padding:10px 12px;
   border:none;
   border-radius:10px;
   background:#1e293b;
   color:white;
+  font-size:18px;
   cursor:pointer;
+  transition: transform 0.3s ease, background 0.2s ease;
+}
+
+#toggleSidebarBtn:hover {
+  background:#334155;
 }
 
 /* ================= SIDEBAR ================= */
@@ -41,57 +47,11 @@ body {
   padding:20px;
   border-right:2px solid #1e293b;
   transition: transform 0.3s ease;
-}
-
-/* desktop default visible */
-.sidebar {
   transform: translateX(0);
 }
 
-/* hidden state (desktop toggle) */
 .sidebar.hidden {
   transform: translateX(-100%);
-}
-
-/* mobile behavior */
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    left:0;
-    top:0;
-    z-index:998;
-    transform: translateX(-100%);
-  }
-
-  .sidebar.mobile-open {
-    transform: translateX(0);
-  }
-}
-
-/* ================= SIDEBAR UI ================= */
-.sidebar button {
-  width:100%;
-  margin-bottom:8px;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  background:#1e293b;
-  color:white;
-  cursor:pointer;
-  text-align:left;
-  transition:0.2s;
-  position:relative;
-  overflow:hidden;
-}
-
-.sidebar button:hover {
-  transform:translateX(6px);
-  background:#334155;
-}
-
-.sidebar button.active {
-  background:#334155;
-  box-shadow:0 0 12px rgba(59,130,246,0.25);
 }
 
 /* ================= MAIN ================= */
@@ -99,7 +59,6 @@ body {
   flex:1;
   padding:20px;
   overflow-y:auto;
-  transition: all 0.3s ease;
 }
 
 /* ================= GRID ================= */
@@ -152,7 +111,7 @@ body {
   100% { left:120%; }
 }
 
-/* borders */
+/* ================= BORDER ================= */
 .family-card::before {
   content:"";
   position:absolute;
@@ -290,44 +249,25 @@ const grid = document.getElementById("grid");
 
 let activeFilter = "all";
 let activeBtn = null;
-let sidebarVisible = true;
+let sidebarOpen = true;
 
 /* TOGGLE SIDEBAR */
 function toggleSidebar(){
   const sidebar = document.querySelector(".sidebar");
   const btn = document.getElementById("toggleSidebarBtn");
 
-  sidebarVisible = !sidebarVisible;
+  sidebarOpen = !sidebarOpen;
 
-  if(window.innerWidth <= 768){
-    sidebar.classList.toggle("mobile-open");
-  } else {
-    sidebar.classList.toggle("hidden");
-  }
-
-  btn.innerText = sidebarVisible ? "☰" : "⟲";
-}
-
-/* AUTO MOBILE BEHAVIOR */
-function handleResponsiveSidebar(){
-  const sidebar = document.querySelector(".sidebar");
-  const btn = document.getElementById("toggleSidebarBtn");
-
-  if(window.innerWidth <= 768){
+  if(sidebarOpen){
     sidebar.classList.remove("hidden");
-    sidebar.classList.remove("mobile-open");
-    sidebarVisible = false;
-    btn.innerText = "☰";
+    btn.innerHTML = "☰";
+    btn.style.transform = "rotate(0deg)";
   } else {
-    sidebar.classList.remove("mobile-open");
-    sidebar.classList.remove("hidden");
-    sidebarVisible = true;
-    btn.innerText = "⟲";
+    sidebar.classList.add("hidden");
+    btn.innerHTML = "✖";
+    btn.style.transform = "rotate(180deg)";
   }
 }
-
-window.addEventListener("load", handleResponsiveSidebar);
-window.addEventListener("resize", handleResponsiveSidebar);
 
 /* FILTER */
 function setFilter(f, btn){
@@ -341,7 +281,7 @@ function setFilter(f, btn){
   }
 }
 
-/* SORT */
+/* SORT A-Z */
 function sortAZ(){
   doodles.sort((a,b) => a.name.localeCompare(b.name));
   render();
@@ -381,8 +321,10 @@ function render(){
       tier = "low";
     } else if (v <= 10) {
       tier = "mid";
+      badgeText = "MID DEMAND";
     } else if (v <= 15) {
       tier = "high";
+      badgeText = "HIGH DEMAND";
     } else {
       tier = "hype";
       badgeText = "HYPE DEMAND";
