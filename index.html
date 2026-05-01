@@ -3,116 +3,155 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Doodle Values</title>
+<title>Doodle Value Index</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Inter, sans-serif;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Inter;
 }
 
 body {
-  display: flex;
-  height: 100vh;
-  background: #0f172a;
-  color: white;
-  overflow: hidden;
+  display:flex;
+  height:100vh;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color:white;
+  overflow:hidden;
 }
 
+/* SIDEBAR */
 .sidebar {
-  width: 240px;
-  background: #0b1220;
-  padding: 20px;
-  border-right: 1px solid rgba(255,255,255,0.05);
+  width:260px;
+  background:#0b1220;
+  padding:20px;
+  border-right:1px solid rgba(255,255,255,0.05);
 }
 
 .sidebar h2 {
-  margin-bottom: 20px;
+  margin-bottom:20px;
 }
 
 .group-btn {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: none;
-  border-radius: 10px;
-  background: #111827;
-  color: #94a3b8;
-  cursor: pointer;
-  text-align: left;
-  transition: 0.2s;
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border:none;
+  border-radius:10px;
+  background:#111827;
+  color:#94a3b8;
+  cursor:pointer;
+  text-align:left;
+  transition:0.2s;
 }
 
 .group-btn:hover,
 .group-btn.active {
-  background: #1e293b;
-  color: white;
+  background:#1e293b;
+  color:white;
+  transform:translateX(3px);
 }
 
+/* MAIN */
 .main {
-  flex: 1;
-  padding: 25px;
-  overflow-y: auto;
+  flex:1;
+  padding:25px;
+  overflow-y:auto;
 }
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:20px;
 }
 
 input {
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #1e293b;
-  background: #020617;
-  color: white;
-  width: 220px;
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #1e293b;
+  background:#020617;
+  color:white;
+  width:240px;
 }
 
+/* GRID */
 .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 15px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:18px;
 }
 
+/* CARD */
 .card {
-  background: #1e293b;
-  padding: 15px;
-  border-radius: 15px;
-  transition: 0.2s;
+  background: linear-gradient(145deg, #1e293b, #0f172a);
+  border:1px solid rgba(255,255,255,0.05);
+  border-radius:18px;
+  padding:15px;
+  position:relative;
+  transition:0.25s;
+  animation:fadeUp 0.4s ease forwards;
+  opacity:0;
+  transform:translateY(10px);
+  overflow:hidden;
 }
 
 .card:hover {
-  transform: scale(1.02);
+  transform:translateY(-6px) scale(1.02);
 }
 
+/* TIERS */
+.low { box-shadow:0 0 10px rgba(59,130,246,0.15); }
+.mid { box-shadow:0 0 15px rgba(34,197,94,0.2); }
+.high { box-shadow:0 0 20px rgba(234,179,8,0.25); }
+.hype {
+  box-shadow:0 0 25px rgba(239,68,68,0.35);
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow:0 0 15px rgba(239,68,68,0.25); }
+  50% { box-shadow:0 0 28px rgba(239,68,68,0.45); }
+  100% { box-shadow:0 0 15px rgba(239,68,68,0.25); }
+}
+
+/* IMAGE */
 img {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  width:100%;
+  border-radius:12px;
+  margin-bottom:10px;
 }
 
+/* BADGE */
+.badge {
+  position:absolute;
+  top:10px;
+  right:10px;
+  padding:5px 8px;
+  font-size:11px;
+  border-radius:8px;
+  background:#0f172a;
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+/* TEXT */
 .value {
-  font-size: 18px;
-  font-weight: 600;
-  margin-top: 5px;
-}
-
-.forms {
-  font-size: 12px;
-  opacity: 0.7;
-  margin-top: 5px;
+  font-size:18px;
+  font-weight:700;
+  margin-top:6px;
 }
 
 .tag {
-  font-size: 12px;
-  opacity: 0.6;
-  margin-top: 5px;
+  font-size:12px;
+  opacity:0.7;
+  margin-top:5px;
+}
+
+/* ANIMATION */
+@keyframes fadeUp {
+  to { opacity:1; transform:translateY(0); }
 }
 </style>
 </head>
@@ -120,22 +159,20 @@ img {
 <body>
 
 <div class="sidebar">
-  <h2>Doodle Values</h2>
+  <h2>Value Index</h2>
 
   <button class="group-btn active" onclick="setGroup('all', this)">All</button>
   <button class="group-btn" onclick="setGroup('Swarms', this)">Swarms</button>
   <button class="group-btn" onclick="setGroup('Mythics', this)">Mythics</button>
   <button class="group-btn" onclick="setGroup('Event Exclusive', this)">Event Exclusive</button>
-  <button class="group-btn" onclick="setGroup('Other', this)">Other</button>  
-  <button class="group-btn" onclick="setGroup('Runic', this)">Runic</button>
-  <button class="group-btn" onclick="setGroup('Dungeon', this)">Dungeon</button>
+  <button class="group-btn" onclick="setGroup('Other', this)">Other</button>
 </div>
 
 <div class="main">
 
   <div class="topbar">
     <h2 id="title">All Doodles</h2>
-    <input id="search" placeholder="Search doodles..." />
+    <input id="search" placeholder="Search..." />
   </div>
 
   <div class="grid" id="grid"></div>
@@ -151,27 +188,60 @@ const grid = document.getElementById("grid");
 const search = document.getElementById("search");
 const title = document.getElementById("title");
 
-function render(list) {
+/* TIER SYSTEM */
+function getTier(value){
+  if(value <= 20) return "low";
+  if(value <= 200) return "mid";
+  if(value <= 1000) return "high";
+  return "hype";
+}
+
+/* DEMAND LABEL */
+function getBadge(value){
+  if(value <= 20) return "LOW DEMAND";
+  if(value <= 200) return "MID DEMAND";
+  if(value <= 1000) return "HIGH DEMAND";
+  return "HYPE / OVERPAID";
+}
+
+/* TREND SYSTEM */
+function getTrend(trend){
+  if(trend === "up") return "⬆️ Rising";
+  if(trend === "down") return "⬇️ Dropping";
+  return "➡️ Stable";
+}
+
+function render(list){
   grid.innerHTML = "";
 
-  list.forEach((d, i) => {
+  list.forEach((d,i) => {
+    const tier = getTier(d.value);
+    const badge = getBadge(d.value);
+
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = `card ${tier}`;
     card.style.animationDelay = (i * 0.03) + "s";
 
     card.innerHTML = `
-      <img src="${d.image}" onerror="this.src='https://via.placeholder.com/300x180?text=Doodle+Image'" />
+      <div class="badge">${badge}</div>
+
+      <img src="${d.image}" 
+      onerror="this.src='https://via.placeholder.com/300x180?text=Doodle+Image'" />
+
       <h3>${d.name}</h3>
-      <div class="value">Value: ${d.value}</div>
-      <div class="forms">Forms: ${d.forms.join(", ")}</div>
-      <div class="tag">${d.group}</div>
+
+      <div class="value">💰 ${d.value}</div>
+
+      <div class="tag">📦 ${d.group}</div>
+
+      <div class="tag">${getTrend(d.trend)}</div>
     `;
 
     grid.appendChild(card);
   });
 }
 
-function filter() {
+function filter(){
   const term = search.value.toLowerCase();
 
   const filtered = doodles.filter(d => {
@@ -187,7 +257,7 @@ function filter() {
   render(filtered);
 }
 
-function setGroup(group, el) {
+function setGroup(group, el){
   activeGroup = group;
 
   document.querySelectorAll(".group-btn").forEach(b => b.classList.remove("active"));
