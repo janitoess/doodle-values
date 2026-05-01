@@ -51,11 +51,43 @@ button {
   border-radius:12px;
   position:relative;
   transition:.2s;
+  overflow:hidden;
 }
 
 .card:hover { transform:scale(1.03); }
 
-/* TIERS */
+/* HEADER BAR */
+.header {
+  padding:6px 10px;
+  border-radius:10px 10px 0 0;
+  font-size:12px;
+  font-weight:bold;
+  text-align:center;
+  margin:-12px -12px 10px -12px;
+}
+
+/* DEMAND COLORS */
+.header.low {
+  background: rgba(59,130,246,0.2);
+  color: #60a5fa;
+}
+
+.header.mid {
+  background: rgba(34,197,94,0.2);
+  color: #4ade80;
+}
+
+.header.high {
+  background: rgba(234,179,8,0.25);
+  color: #facc15;
+}
+
+.header.hype {
+  background: rgba(239,68,68,0.25);
+  color: #f87171;
+}
+
+/* TIERS GLOW */
 .low { box-shadow:0 0 10px rgba(59,130,246,0.2); }
 .mid { box-shadow:0 0 10px rgba(34,197,94,0.2); }
 .high { box-shadow:0 0 10px rgba(234,179,8,0.2); }
@@ -69,6 +101,12 @@ button {
   cursor:pointer;
 }
 
+/* IMAGE */
+img {
+  width:100%;
+  border-radius:8px;
+}
+
 /* TOP BAR */
 .topbar {
   display:flex;
@@ -80,14 +118,24 @@ input {
   padding:8px;
   border-radius:8px;
   border:none;
+  width:100%;
 }
 
 /* TRADE BOX */
 .trade {
-  margin-top:20px;
+  margin-top:25px;
   padding:15px;
   background:#020617;
   border-radius:10px;
+}
+
+.trade input {
+  margin-bottom:10px;
+}
+
+.result {
+  margin-top:10px;
+  font-weight:bold;
 }
 </style>
 </head>
@@ -106,17 +154,25 @@ input {
 <div class="main">
 
 <div class="topbar">
-  <input id="search" placeholder="Search...">
+  <input id="search" placeholder="Search doodles...">
 </div>
 
 <div class="grid" id="grid"></div>
 
+<!-- TRADE CALCULATOR -->
 <div class="trade">
-  <h3>Trade Calculator</h3>
-  <input id="d1" placeholder="Doodle 1">
-  <input id="d2" placeholder="Doodle 2">
-  <button onclick="compare()">Compare</button>
-  <p id="result"></p>
+  <h3>Advanced Trade Calculator</h3>
+
+  <p>Your Offer</p>
+  <input id="offer1" placeholder="Snobat, Fluppy">
+
+  <p>Their Offer</p>
+  <input id="offer2" placeholder="Pebblett">
+
+  <button onclick="calculateTrade()">Evaluate Trade</button>
+
+  <div class="result" id="tradeResult"></div>
+  <div id="tradeDetails"></div>
 </div>
 
 </div>
@@ -129,7 +185,7 @@ let favorites = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
 
-/* SYSTEMS */
+/* TIER SYSTEM */
 function getTier(v){
   if(v<=20) return "low";
   if(v<=200) return "mid";
@@ -137,21 +193,27 @@ function getTier(v){
   return "hype";
 }
 
+/* LABEL */
+function getDemandLabel(value){
+  if(value <= 20) return "LOW DEMAND";
+  if(value <= 200) return "MID DEMAND";
+  if(value <= 1000) return "HIGH DEMAND";
+  return "HYPE / OVERPAID";
+}
+
+/* TREND */
 function trendIcon(t){
   if(t==="up") return "⬆️";
   if(t==="down") return "⬇️";
   return "➡️";
 }
 
-/* LIVE VALUE MOVEMENT */
-function fluctuate(){
-  doodles.forEach(d=>{
-    let change = Math.floor(Math.random()*3)-1;
-    d.value = Math.max(1, d.value + change);
-  });
-  render();
+/* DEMAND MULTIPLIER */
+function getDemandMultiplier(trend){
+  if(trend === "up") return 1.1;
+  if(trend === "down") return 0.9;
+  return 1;
 }
-setInterval(fluctuate, 4000);
 
 /* FAVORITES */
 function toggleFav(name){
@@ -162,6 +224,50 @@ function toggleFav(name){
   }
   localStorage.setItem("fav", JSON.stringify(favorites));
   render();
+}
+
+/* FIND */
+function findDoodle(name){
+  return doodles.find(d =>
+    d.name.toLowerCase().includes(name.trim().toLowerCase())
+  );
+}
+
+/* CALC SIDE */
+function calculateSide(input){
+  const names = input.split(",");
+  let total = 0;
+  let details = [];
+
+  names.forEach(n => {
+    const d = findDoodle(n);
+    if(d){
+      const adjusted = Math.floor(d.value * getDemandMultiplier(d.trend));
+      total += adjusted;
+      details.push(`${d.name} (${adjusted})`);
+    }
+  });
+
+  return { total, details };
+}
+
+/* TRADE */
+function calculateTrade(){
+  const a = calculateSide(document.getElementById("offer1").value);
+  const b = calculateSide(document.getElementById("offer2").value);
+
+  const diff = a.total - b.total;
+
+  let result = "";
+  if(Math.abs(diff) <= 5) result = "⚖️ Fair";
+  else if(diff > 5) result = "📈 Win";
+  else result = "📉 Loss";
+
+  document.getElementById("tradeResult").innerText =
+    `${result} (Diff: ${diff})`;
+
+  document.getElementById("tradeDetails").innerText =
+    `You: ${a.total} | Them: ${b.total}`;
 }
 
 /* RENDER */
@@ -178,10 +284,16 @@ function render(){
     if(filterType==="hype" && d.value<1000) return;
     if(filterType==="fav" && !favorites.includes(d.name)) return;
 
+    const tier = getTier(d.value);
+
     const card=document.createElement("div");
-    card.className="card "+getTier(d.value);
+    card.className="card "+tier;
 
     card.innerHTML=`
+      <div class="header ${tier}">
+        ${getDemandLabel(d.value)}
+      </div>
+
       <div class="star" onclick="toggleFav('${d.name}')">
         ${favorites.includes(d.name) ? "⭐" : "☆"}
       </div>
@@ -204,28 +316,6 @@ function setFilter(f){
   render();
 }
 
-/* TRADE CALCULATOR */
-function compare(){
-  const a = doodles.find(d=>d.name.toLowerCase().includes(document.getElementById("d1").value.toLowerCase()));
-  const b = doodles.find(d=>d.name.toLowerCase().includes(document.getElementById("d2").value.toLowerCase()));
-
-  if(!a || !b){
-    document.getElementById("result").innerText="Invalid input";
-    return;
-  }
-
-  let diff = a.value - b.value;
-
-  if(Math.abs(diff) <= 5) return result("Fair Trade");
-  if(diff > 5) return result("Win");
-  return result("Loss");
-}
-
-function result(text){
-  document.getElementById("result").innerText=text;
-}
-
-/* INIT */
 document.getElementById("search").addEventListener("input", render);
 
 render();
