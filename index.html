@@ -14,7 +14,6 @@ body {
   display:flex;
 }
 
-/* SIDEBAR */
 .sidebar {
   width:260px;
   background:#020617;
@@ -32,7 +31,6 @@ button {
   cursor:pointer;
 }
 
-/* MAIN */
 .main {
   flex:1;
   padding:20px;
@@ -44,7 +42,6 @@ button {
   gap:15px;
 }
 
-/* CARD */
 .card {
   background:#1e293b;
   padding:12px;
@@ -53,11 +50,8 @@ button {
   transition:.2s;
 }
 
-.card:hover {
-  transform:scale(1.03);
-}
+.card:hover { transform:scale(1.03); }
 
-/* HEADER */
 .header {
   padding:6px 10px;
   border-radius:10px 10px 0 0;
@@ -72,13 +66,11 @@ button {
 .header.high { background:rgba(234,179,8,0.25); color:#facc15; }
 .header.hype { background:rgba(239,68,68,0.25); color:#f87171; }
 
-/* TIERS */
 .low { box-shadow:0 0 10px rgba(59,130,246,0.2); }
 .mid { box-shadow:0 0 10px rgba(34,197,94,0.2); }
 .high { box-shadow:0 0 10px rgba(234,179,8,0.2); }
 .hype { box-shadow:0 0 20px rgba(239,68,68,0.4); }
 
-/* STAR */
 .star {
   position:absolute;
   top:8px;
@@ -91,7 +83,6 @@ img {
   border-radius:8px;
 }
 
-/* TOPBAR */
 .topbar {
   display:flex;
   gap:10px;
@@ -128,7 +119,6 @@ input {
 
 </div>
 
-<!-- IMPORTANT: must load FIRST -->
 <script src="data.js"></script>
 
 <script>
@@ -137,10 +127,8 @@ let favorites = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
 
-/* SAFETY CHECK */
-if (!window.doodles) {
-  console.error("data.js not loaded or doodles is missing");
-}
+/* SAFE ACCESS */
+const list = window.doodles || [];
 
 /* TIER */
 function getTier(v){
@@ -158,7 +146,7 @@ function getLabel(v){
   return "HYPE / OVERPAID";
 }
 
-/* TREND SAFE */
+/* TREND */
 function trendIcon(t){
   if(t === "up") return "⬆️";
   if(t === "down") return "⬇️";
@@ -182,14 +170,14 @@ function setFilter(f){
   render();
 }
 
-/* RENDER (SAFE VERSION) */
+/* RENDER */
 function render(){
   const term = (document.getElementById("search").value || "").toLowerCase();
   grid.innerHTML = "";
 
-  (window.doodles || []).forEach(d => {
+  list.forEach(d => {
 
-    if(!d || !d.name) return;
+    if(!d) return;
 
     if(term && !d.name.toLowerCase().includes(term)) return;
 
@@ -199,25 +187,24 @@ function render(){
     if(filterType === "fav" && !favorites.includes(d.name)) return;
 
     const tier = getTier(d.value || 0);
-    const label = getLabel(d.value || 0);
-    const trend = d.trend || "stable";
 
     const card = document.createElement("div");
     card.className = "card " + tier;
 
     card.innerHTML = `
-      <div class="header ${tier}">${label}</div>
+      <div class="header ${tier}">
+        ${getLabel(d.value || 0)}
+      </div>
 
       <div class="star" onclick="toggleFav('${d.name}')">
         ${favorites.includes(d.name) ? "⭐" : "☆"}
       </div>
 
-      <img src="${d.image || ''}"
-      onerror="this.src='https://via.placeholder.com/200'">
+      <img src="${d.image}" onerror="this.src='https://via.placeholder.com/200'">
 
       <h4>${d.name}</h4>
-      <p>💰 ${d.value ?? 0}</p>
-      <p>${trendIcon(trend)}</p>
+      <p>💰 ${d.value}</p>
+      <p>${trendIcon(d.trend)}</p>
     `;
 
     grid.appendChild(card);
