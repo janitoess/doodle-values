@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Doodle World Values</title>
+<title>Doodle Values</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -19,33 +19,40 @@ body {
   overflow:hidden;
 }
 
+/* SIDEBAR */
 .sidebar {
-  width:220px;
+  width:240px;
   background:rgba(15,23,42,0.95);
   padding:20px;
   border-right:1px solid rgba(255,255,255,0.05);
 }
 
-.logo { font-size:20px; font-weight:700; margin-bottom:20px; }
+.logo {
+  font-size:20px;
+  font-weight:700;
+  margin-bottom:15px;
+}
 
-.nav button {
+.group-btn {
   width:100%;
   padding:10px;
   margin-bottom:10px;
-  background:transparent;
   border:none;
-  color:#94a3b8;
-  text-align:left;
   border-radius:10px;
   cursor:pointer;
+  background:#0f172a;
+  color:#94a3b8;
+  text-align:left;
+  transition:0.2s;
 }
 
-.nav button:hover,
-.nav button.active {
+.group-btn:hover,
+.group-btn.active {
   background:#1e293b;
   color:white;
 }
 
+/* MAIN */
 .main {
   flex:1;
   padding:25px;
@@ -55,7 +62,7 @@ body {
 .topbar {
   display:flex;
   justify-content:space-between;
-  margin-bottom:25px;
+  margin-bottom:20px;
 }
 
 input {
@@ -64,24 +71,25 @@ input {
   padding:10px;
   border-radius:10px;
   color:white;
-  width:220px;
 }
 
+/* GRID */
 .grid {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
   gap:20px;
 }
 
+/* CARD */
 .card {
   background:rgba(30,41,59,0.6);
   backdrop-filter:blur(10px);
   border-radius:20px;
   padding:15px;
   transition:0.25s;
+  animation:fadeUp 0.4s forwards;
   opacity:0;
   transform:translateY(10px);
-  animation:fadeUp 0.4s forwards;
 }
 
 .card:hover {
@@ -102,31 +110,41 @@ img {
 .value {
   font-size:20px;
   font-weight:600;
-  margin-top:8px;
 }
 
-.evo {
+.meta {
+  font-size:13px;
+  opacity:0.8;
+  margin-top:6px;
+}
+
+.tag {
+  display:inline-block;
+  margin-top:8px;
   font-size:12px;
   opacity:0.7;
-  margin-top:6px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
   <div class="logo">Doodle Values</div>
 
-  <div class="nav">
-    <button class="active" onclick="showAll(this)">All Doodles</button>
-  </div>
+  <button class="group-btn active" onclick="setGroup('all', this)">All</button>
+  <button class="group-btn" onclick="setGroup('Swarms', this)">Swarms</button>
+  <button class="group-btn" onclick="setGroup('Mythics', this)">Mythics</button>
+  <button class="group-btn" onclick="setGroup('Event Exclusive', this)">Event Exclusive</button>
+  <button class="group-btn" onclick="setGroup('Other', this)">Other</button>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 
   <div class="topbar">
-    <h2>Doodle World Values</h2>
+    <h2 id="title">All Doodles</h2>
     <input id="search" placeholder="Search doodles..."/>
   </div>
 
@@ -136,22 +154,20 @@ img {
 
 <script>
 
+let activeGroup = "all";
+
 const data = [
   {
     name: "Beetle Line",
     value: 10,
+    group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/beetle.png",
     forms: ["Beetle", "Beetle Evo"]
   },
   {
-    name: "Fly Line",
-    value: 10,
-    image: "https://static.wikia.nocookie.net/doodle-world/images/fly.png",
-    forms: ["Fly", "Fly Evo"]
-  },
-  {
     name: "Chronos Line",
     value: 2500,
+    group: "Mythics",
     image: "https://static.wikia.nocookie.net/doodle-world/images/chronos.png",
     forms: ["Chronos"]
   }
@@ -159,6 +175,7 @@ const data = [
 
 const grid = document.getElementById("grid");
 const search = document.getElementById("search");
+const title = document.getElementById("title");
 
 function render(items) {
   grid.innerHTML = "";
@@ -172,29 +189,41 @@ function render(items) {
       <img src="${item.image}" />
       <h2>${item.name}</h2>
       <div class="value">${item.value}</div>
-      <div class="evo">Forms: ${item.forms.join(", ")}</div>
+      <div class="meta">${item.forms.join(", ")}</div>
+      <div class="tag">${item.group}</div>
     `;
 
     grid.appendChild(card);
   });
 }
 
-search.addEventListener("input", () => {
+function filter() {
   const term = search.value.toLowerCase();
 
-  const filtered = data.filter(d =>
-    d.name.toLowerCase().includes(term) ||
-    d.forms.some(f => f.toLowerCase().includes(term))
-  );
+  const filtered = data.filter(d => {
+    const matchesGroup = activeGroup === "all" || d.group === activeGroup;
+    const matchesSearch =
+      d.name.toLowerCase().includes(term) ||
+      d.forms.some(f => f.toLowerCase().includes(term));
+
+    return matchesGroup && matchesSearch;
+  });
 
   render(filtered);
-});
-
-function showAll(btn) {
-  document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  render(data);
 }
+
+function setGroup(group, el) {
+  activeGroup = group;
+
+  document.querySelectorAll(".group-btn").forEach(b => b.classList.remove("active"));
+  el.classList.add("active");
+
+  title.innerText = group === "all" ? "All Doodles" : group;
+
+  filter();
+}
+
+search.addEventListener("input", filter);
 
 render(data);
 
