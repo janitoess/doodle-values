@@ -18,6 +18,20 @@ body {
   display:flex;
 }
 
+/* ================= TOGGLE BUTTON ================= */
+#toggleSidebarBtn {
+  position:fixed;
+  top:15px;
+  left:15px;
+  z-index:999;
+  padding:10px 12px;
+  border:none;
+  border-radius:10px;
+  background:#1e293b;
+  color:white;
+  cursor:pointer;
+}
+
 /* ================= SIDEBAR ================= */
 .sidebar {
   width:240px;
@@ -26,8 +40,35 @@ body {
   background:#020617;
   padding:20px;
   border-right:2px solid #1e293b;
+  transition: transform 0.3s ease;
 }
 
+/* desktop default visible */
+.sidebar {
+  transform: translateX(0);
+}
+
+/* hidden state (desktop toggle) */
+.sidebar.hidden {
+  transform: translateX(-100%);
+}
+
+/* mobile behavior */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left:0;
+    top:0;
+    z-index:998;
+    transform: translateX(-100%);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+}
+
+/* ================= SIDEBAR UI ================= */
 .sidebar button {
   width:100%;
   margin-bottom:8px;
@@ -51,29 +92,6 @@ body {
 .sidebar button.active {
   background:#334155;
   box-shadow:0 0 12px rgba(59,130,246,0.25);
-  transform:translateX(6px);
-}
-
-/* animated shimmer sweep */
-.sidebar button::after {
-  content:"";
-  position:absolute;
-  top:0;
-  left:-120%;
-  width:60%;
-  height:100%;
-  background:linear-gradient(
-    120deg,
-    transparent,
-    rgba(255,255,255,0.08),
-    transparent
-  );
-  transform:skewX(-20deg);
-}
-
-.sidebar button:hover::after {
-  left:120%;
-  transition:0.5s;
 }
 
 /* ================= MAIN ================= */
@@ -81,6 +99,7 @@ body {
   flex:1;
   padding:20px;
   overflow-y:auto;
+  transition: all 0.3s ease;
 }
 
 /* ================= GRID ================= */
@@ -107,7 +126,7 @@ body {
   box-shadow:0 12px 35px rgba(0,0,0,0.5);
 }
 
-/* ================= SHIMMER ================= */
+/* shimmer */
 .family-card::after {
   content:"";
   position:absolute;
@@ -133,14 +152,13 @@ body {
   100% { left:120%; }
 }
 
-/* ================= BORDER ================= */
+/* borders */
 .family-card::before {
   content:"";
   position:absolute;
   inset:0;
   padding:2px;
   border-radius:14px;
-
   background:linear-gradient(135deg,#60a5fa,#1e3a8a);
 
   -webkit-mask:
@@ -243,6 +261,9 @@ img {
 
 <body>
 
+<!-- TOGGLE BUTTON -->
+<button id="toggleSidebarBtn" onclick="toggleSidebar()">☰</button>
+
 <!-- SIDEBAR -->
 <div class="sidebar">
   <h3 style="color:white;">Filters</h3>
@@ -269,6 +290,44 @@ const grid = document.getElementById("grid");
 
 let activeFilter = "all";
 let activeBtn = null;
+let sidebarVisible = true;
+
+/* TOGGLE SIDEBAR */
+function toggleSidebar(){
+  const sidebar = document.querySelector(".sidebar");
+  const btn = document.getElementById("toggleSidebarBtn");
+
+  sidebarVisible = !sidebarVisible;
+
+  if(window.innerWidth <= 768){
+    sidebar.classList.toggle("mobile-open");
+  } else {
+    sidebar.classList.toggle("hidden");
+  }
+
+  btn.innerText = sidebarVisible ? "☰" : "⟲";
+}
+
+/* AUTO MOBILE BEHAVIOR */
+function handleResponsiveSidebar(){
+  const sidebar = document.querySelector(".sidebar");
+  const btn = document.getElementById("toggleSidebarBtn");
+
+  if(window.innerWidth <= 768){
+    sidebar.classList.remove("hidden");
+    sidebar.classList.remove("mobile-open");
+    sidebarVisible = false;
+    btn.innerText = "☰";
+  } else {
+    sidebar.classList.remove("mobile-open");
+    sidebar.classList.remove("hidden");
+    sidebarVisible = true;
+    btn.innerText = "⟲";
+  }
+}
+
+window.addEventListener("load", handleResponsiveSidebar);
+window.addEventListener("resize", handleResponsiveSidebar);
 
 /* FILTER */
 function setFilter(f, btn){
@@ -282,7 +341,7 @@ function setFilter(f, btn){
   }
 }
 
-/* SORT A-Z ONLY */
+/* SORT */
 function sortAZ(){
   doodles.sort((a,b) => a.name.localeCompare(b.name));
   render();
@@ -301,7 +360,6 @@ function render(){
 
   let list = [...doodles];
 
-  /* FILTER */
   list = list.filter(d => {
     const v = d.values.UHT6;
 
@@ -321,13 +379,10 @@ function render(){
 
     if (v <= 5) {
       tier = "low";
-      badgeText = "LOW DEMAND";
     } else if (v <= 10) {
       tier = "mid";
-      badgeText = "MID DEMAND";
     } else if (v <= 15) {
       tier = "high";
-      badgeText = "HIGH DEMAND";
     } else {
       tier = "hype";
       badgeText = "HYPE DEMAND";
