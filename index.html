@@ -18,7 +18,7 @@ body {
   display:flex;
 }
 
-/* ================= TOGGLE BUTTON ================= */
+/* ================= TOGGLE ================= */
 #toggleSidebarBtn {
   position:fixed;
   top:15px;
@@ -31,14 +31,9 @@ body {
   color:white;
   font-size:18px;
   cursor:pointer;
-  transition: transform 0.3s ease, background 0.2s ease;
 }
 
-#toggleSidebarBtn:hover {
-  background:#334155;
-}
-
-/* ================= SIDEBAR (FIXED) ================= */
+/* ================= SIDEBAR ================= */
 .sidebar {
   width:240px;
   min-width:240px;
@@ -46,31 +41,15 @@ body {
   background:#020617;
   padding:20px;
   border-right:2px solid #1e293b;
-
   transition: transform 0.3s ease;
   transform: translateX(0);
-
   position: relative;
-  z-index: 20;
+  z-index:20;
 }
 
 .sidebar.hidden {
   transform: translateX(-100%);
-  pointer-events: none;
-}
-
-/* ================= MOBILE FIX ================= */
-@media (max-width: 768px) {
-  .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 30;
-  }
-
-  .main {
-    width: 100%;
-  }
+  pointer-events:none;
 }
 
 /* ================= TITLE ================= */
@@ -78,49 +57,32 @@ body {
   color:white;
   margin-bottom:14px;
   font-size:16px;
-  letter-spacing:0.5px;
   line-height:1.2;
 }
 
-/* ================= PREMIUM BUTTONS ================= */
+/* ================= SEARCH ================= */
+.sidebar input {
+  width:100%;
+  padding:10px 12px;
+  margin-bottom:12px;
+  border-radius:10px;
+  border:none;
+  background:#0f172a;
+  color:white;
+  box-shadow: inset 0 0 0 1px #1e293b;
+}
+
+/* ================= BUTTONS ================= */
 .sidebar button {
   width:100%;
   margin-bottom:10px;
   padding:12px 14px;
   border:none;
   border-radius:12px;
-
   background:linear-gradient(145deg,#1e293b,#111827);
   color:#e2e8f0;
-
   cursor:pointer;
   text-align:left;
-
-  font-size:14px;
-  font-weight:600;
-  letter-spacing:0.3px;
-
-  transition: all 0.25s ease;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.05),
-    0 6px 18px rgba(0,0,0,0.25);
-}
-
-.sidebar button:hover {
-  transform:translateX(6px) scale(1.02);
-  background:linear-gradient(145deg,#334155,#1e293b);
-  box-shadow:
-    0 10px 25px rgba(0,0,0,0.4),
-    0 0 12px rgba(59,130,246,0.15);
-}
-
-.sidebar button.active {
-  background:linear-gradient(145deg,#334155,#1e293b);
-  box-shadow:
-    0 0 14px rgba(59,130,246,0.25),
-    inset 0 0 0 1px rgba(255,255,255,0.08);
-  transform:translateX(6px);
 }
 
 /* ================= MAIN ================= */
@@ -145,42 +107,14 @@ body {
   padding:12px;
   cursor:pointer;
   overflow:hidden;
-  transition:transform 0.25s ease, box-shadow 0.25s ease;
+  transition:0.25s;
 }
 
 .family-card:hover {
   transform:scale(1.04);
-  z-index:10;
-  box-shadow:0 12px 35px rgba(0,0,0,0.5);
 }
 
-/* ================= SHIMMER ================= */
-.family-card::after {
-  content:"";
-  position:absolute;
-  top:0;
-  left:-120%;
-  width:60%;
-  height:100%;
-  background:linear-gradient(
-    120deg,
-    transparent 0%,
-    rgba(255,255,255,0.06) 45%,
-    rgba(255,255,255,0.14) 50%,
-    rgba(255,255,255,0.06) 55%,
-    transparent 100%
-  );
-  transform:skewX(-20deg);
-  animation: shimmer 5s infinite;
-  pointer-events:none;
-}
-
-@keyframes shimmer {
-  0% { left:-120%; }
-  100% { left:120%; }
-}
-
-/* ================= BORDER SYSTEM ================= */
+/* ================= BORDER ================= */
 .family-card::before {
   content:"";
   position:absolute;
@@ -196,23 +130,10 @@ body {
   mask-composite:exclude;
 }
 
-/* LOW */
-.family-card.low::before {
-  background:linear-gradient(135deg,#60a5fa,#1e3a8a);
-}
-
-/* MID */
-.family-card.mid::before {
-  background:linear-gradient(135deg,#4ade80,#14532d);
-}
-
-/* HIGH */
-.family-card.high::before {
-  background:linear-gradient(135deg,#facc15,#92400e);
-}
-
-/* HYPE */
-.family-card.hype::before {
+.low::before { background:linear-gradient(135deg,#60a5fa,#1e3a8a); }
+.mid::before { background:linear-gradient(135deg,#4ade80,#14532d); }
+.high::before { background:linear-gradient(135deg,#facc15,#92400e); }
+.hype::before {
   background:linear-gradient(270deg,#f87171,#fb7185,#f97316);
   background-size:400% 400%;
   animation:hypeBorder 3s ease infinite;
@@ -224,20 +145,6 @@ body {
   100% { background-position:0% 50%; }
 }
 
-/* ================= GLOW ================= */
-.glow-low { box-shadow:0 0 10px rgba(96,165,250,0.15); }
-.glow-mid { box-shadow:0 0 14px rgba(74,222,128,0.18); }
-.glow-high { box-shadow:0 0 18px rgba(250,204,21,0.22); }
-.glow-hype { box-shadow:0 0 25px rgba(248,113,113,0.35); }
-
-/* ================= HEADER ================= */
-.family-header {
-  display:flex;
-  justify-content:space-between;
-  font-weight:bold;
-  color:white;
-}
-
 /* ================= BADGES ================= */
 .badge {
   font-size:11px;
@@ -246,32 +153,30 @@ body {
   font-weight:bold;
 }
 
-.badge.low {
-  background:rgba(96,165,250,0.15);
-  color:#60a5fa;
+.badge.low { background:rgba(96,165,250,0.15); color:#60a5fa; }
+.badge.mid { background:rgba(74,222,128,0.15); color:#4ade80; }
+.badge.high { background:rgba(250,204,21,0.15); color:#facc15; }
+.badge.hype { background:rgba(248,113,113,0.15); color:#f87171; }
+
+/* ================= HEADER ================= */
+.family-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:bold;
+  color:white;
 }
 
-.badge.mid {
-  background:rgba(74,222,128,0.15);
-  color:#4ade80;
+/* ================= TREND INDICATOR ================= */
+.trend {
+  margin-left:8px;
+  font-size:12px;
+  opacity:0.9;
 }
 
-.badge.high {
-  background:rgba(250,204,21,0.15);
-  color:#facc15;
-}
-
-.badge.hype {
-  background:rgba(248,113,113,0.15);
-  color:#f87171;
-  animation:badgePulse 1.5s infinite;
-}
-
-@keyframes badgePulse {
-  0% { box-shadow:0 0 0 rgba(248,113,113,0); }
-  50% { box-shadow:0 0 14px rgba(248,113,113,0.7); }
-  100% { box-shadow:0 0 0 rgba(248,113,113,0); }
-}
+.trend.up { color:#4ade80; }
+.trend.down { color:#f87171; }
+.trend.stable { color:#94a3b8; }
 
 /* ================= IMAGE ================= */
 img {
@@ -293,21 +198,16 @@ img {
   opacity:1;
 }
 
-/* ================= FORMS ================= */
-.forms {
-  color:#93c5fd;
-  margin-top:6px;
-}
-
 /* ================= VALUES ================= */
 .values div {
   padding:2px 0;
   color:#e2e8f0;
 }
 
-.value-low { color:#f87171; }
-.value-mid { color:#facc15; }
-.value-high { color:#4ade80; }
+.forms {
+  color:#93c5fd;
+  margin-top:6px;
+}
 </style>
 </head>
 
@@ -321,14 +221,16 @@ img {
     <span style="opacity:0.6; font-size:12px;">by janitoess</span>
   </h2>
 
-  <button class="active">All</button>
-  <button>Rising</button>
-  <button>High</button>
-  <button>Hype</button>
+  <input id="searchInput" placeholder="🔍 Search doodles..." />
+
+  <button onclick="setFilter('all')">All</button>
+  <button onclick="setFilter('rising')">Rising</button>
+  <button onclick="setFilter('high')">High</button>
+  <button onclick="setFilter('hype')">Hype</button>
 
   <hr style="border:1px solid #1e293b; margin:12px 0;">
 
-  <button>Sort: A → Z</button>
+  <button onclick="sortAZ()">Sort: A → Z</button>
 </div>
 
 <div class="main">
@@ -340,36 +242,76 @@ img {
 <script>
 const grid = document.getElementById("grid");
 
-let sidebarOpen = true;
+let searchQuery = "";
+let activeFilter = "all";
 
+/* TOGGLE */
 function toggleSidebar(){
-  const sidebar = document.querySelector(".sidebar");
-  const btn = document.getElementById("toggleSidebarBtn");
-
-  sidebarOpen = !sidebarOpen;
-
-  if(sidebarOpen){
-    sidebar.classList.remove("hidden");
-    btn.innerHTML = "☰";
-    btn.style.transform = "rotate(0deg)";
-  } else {
-    sidebar.classList.add("hidden");
-    btn.innerHTML = "✖";
-    btn.style.transform = "rotate(180deg)";
-  }
+  document.querySelector(".sidebar").classList.toggle("hidden");
 }
 
+/* SEARCH */
+document.getElementById("searchInput").addEventListener("input", e => {
+  searchQuery = e.target.value.toLowerCase();
+  render();
+});
+
+/* FILTER */
+function setFilter(f){
+  activeFilter = f;
+  render();
+}
+
+/* SORT */
+function sortAZ(){
+  doodles.sort((a,b) => a.name.localeCompare(b.name));
+  render();
+}
+
+/* TREND ICON */
+function getTrendIcon(trend){
+  if(trend === "up") return "↑";
+  if(trend === "down") return "↓";
+  return "→";
+}
+
+/* RENDER */
 function render(){
   grid.innerHTML = "";
 
-  doodles.forEach(d => {
+  let list = [...doodles];
+
+  // FILTER
+  list = list.filter(d => {
+    const v = d.values.UHT6;
+
+    if(activeFilter === "rising") return d.trend === "up";
+    if(activeFilter === "high") return v > 10 && v <= 15;
+    if(activeFilter === "hype") return v > 15;
+
+    return true;
+  });
+
+  // SEARCH
+  if(searchQuery){
+    list = list.filter(d =>
+      d.name.toLowerCase().includes(searchQuery) ||
+      d.forms.join(" ").toLowerCase().includes(searchQuery)
+    );
+  }
+
+  // SORT
+  list.sort((a,b) => a.name.localeCompare(b.name));
+
+  // RENDER
+  list.forEach(d => {
 
     const v = d.values.UHT6;
 
     let tier = "low";
     let badgeText = "LOW DEMAND";
 
-    if (v <= 5) tier = "low";
+    if (v <= 5) { tier = "low"; }
     else if (v <= 10) { tier = "mid"; badgeText = "MID DEMAND"; }
     else if (v <= 15) { tier = "high"; badgeText = "HIGH DEMAND"; }
     else { tier = "hype"; badgeText = "HYPE DEMAND"; }
@@ -379,21 +321,25 @@ function render(){
 
     card.innerHTML = `
       <div class="family-header">
-        <div>${d.name}</div>
+        <div>
+          ${d.name}
+          <span class="trend ${d.trend}">
+            ${getTrendIcon(d.trend)}
+          </span>
+        </div>
+
         <div class="badge ${tier}">${badgeText}</div>
       </div>
 
       <img src="${d.image}">
 
       <div class="family-content">
-        <div class="forms">
-          ${d.forms.join(" → ")}
-        </div>
+        <div class="forms">${d.forms.join(" → ")}</div>
 
         <div class="values">
-          ${Object.entries(d.values).map(([k,v]) => `
-            <div>${k}: ${v}</div>
-          `).join("")}
+          ${Object.entries(d.values).map(([k,v]) =>
+            `<div>${k}: ${v}</div>`
+          ).join("")}
         </div>
       </div>
     `;
