@@ -8,121 +8,115 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter, sans-serif;
+}
 
 body {
-  font-family: Inter, sans-serif;
-  background: linear-gradient(135deg,#020617,#0f172a);
-  color:#e2e8f0;
-  display:flex;
-  height:100vh;
-  overflow:hidden;
+  display: flex;
+  height: 100vh;
+  background: #0f172a;
+  color: white;
+  overflow: hidden;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width:240px;
-  background:rgba(15,23,42,0.95);
-  padding:20px;
-  border-right:1px solid rgba(255,255,255,0.05);
+  width: 240px;
+  background: #0b1220;
+  padding: 20px;
+  border-right: 1px solid rgba(255,255,255,0.05);
 }
 
-.logo {
-  font-size:20px;
-  font-weight:700;
-  margin-bottom:15px;
+.sidebar h2 {
+  margin-bottom: 20px;
 }
 
 .group-btn {
-  width:100%;
-  padding:10px;
-  margin-bottom:10px;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  background:#0f172a;
-  color:#94a3b8;
-  text-align:left;
-  transition:0.2s;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #111827;
+  color: #94a3b8;
+  cursor: pointer;
+  text-align: left;
+  transition: 0.2s;
 }
 
 .group-btn:hover,
 .group-btn.active {
-  background:#1e293b;
-  color:white;
+  background: #1e293b;
+  color: white;
 }
 
 /* MAIN */
 .main {
-  flex:1;
-  padding:25px;
-  overflow-y:auto;
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
 }
 
 .topbar {
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:20px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 input {
-  background:#020617;
-  border:1px solid #1e293b;
-  padding:10px;
-  border-radius:10px;
-  color:white;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: white;
+  width: 220px;
 }
 
 /* GRID */
 .grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 15px;
 }
 
 /* CARD */
 .card {
-  background:rgba(30,41,59,0.6);
-  backdrop-filter:blur(10px);
-  border-radius:20px;
-  padding:15px;
-  transition:0.25s;
-  animation:fadeUp 0.4s forwards;
-  opacity:0;
-  transform:translateY(10px);
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 15px;
+  transition: 0.2s;
 }
 
 .card:hover {
-  transform:translateY(-5px) scale(1.02);
-  box-shadow:0 20px 40px rgba(0,0,0,0.6);
-}
-
-@keyframes fadeUp {
-  to { opacity:1; transform:translateY(0); }
+  transform: scale(1.02);
 }
 
 img {
-  width:100%;
-  border-radius:12px;
-  margin-bottom:10px;
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
 
 .value {
-  font-size:20px;
-  font-weight:600;
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 5px;
 }
 
-.meta {
-  font-size:13px;
-  opacity:0.8;
-  margin-top:6px;
+.forms {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 5px;
 }
 
 .tag {
-  display:inline-block;
-  margin-top:8px;
-  font-size:12px;
-  opacity:0.7;
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 5px;
 }
 </style>
 </head>
@@ -131,7 +125,7 @@ img {
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-  <div class="logo">Doodle Values</div>
+  <h2>Doodle Values</h2>
 
   <button class="group-btn active" onclick="setGroup('all', this)">All</button>
   <button class="group-btn" onclick="setGroup('Swarms', this)">Swarms</button>
@@ -145,52 +139,37 @@ img {
 
   <div class="topbar">
     <h2 id="title">All Doodles</h2>
-    <input id="search" placeholder="Search doodles..."/>
+    <input id="search" placeholder="Search doodles..." />
   </div>
 
   <div class="grid" id="grid"></div>
 
 </div>
 
+<!-- DATA -->
+<script src="data.js"></script>
+
 <script>
-
 let activeGroup = "all";
-
-const data = [
-  {
-    name: "Beetle Line",
-    value: 10,
-    group: "Swarms",
-    image: "https://static.wikia.nocookie.net/doodle-world/images/beetle.png",
-    forms: ["Beetle", "Beetle Evo"]
-  },
-  {
-    name: "Chronos Line",
-    value: 2500,
-    group: "Mythics",
-    image: "https://static.wikia.nocookie.net/doodle-world/images/chronos.png",
-    forms: ["Chronos"]
-  }
-];
 
 const grid = document.getElementById("grid");
 const search = document.getElementById("search");
 const title = document.getElementById("title");
 
-function render(items) {
+function render(list) {
   grid.innerHTML = "";
 
-  items.forEach((item,i) => {
+  list.forEach((d, i) => {
     const card = document.createElement("div");
     card.className = "card";
-    card.style.animationDelay = i * 0.05 + "s";
+    card.style.animationDelay = (i * 0.03) + "s";
 
     card.innerHTML = `
-      <img src="${item.image}" />
-      <h2>${item.name}</h2>
-      <div class="value">${item.value}</div>
-      <div class="meta">${item.forms.join(", ")}</div>
-      <div class="tag">${item.group}</div>
+      <img src="${d.image}" />
+      <h3>${d.name}</h3>
+      <div class="value">Value: ${d.value}</div>
+      <div class="forms">Forms: ${d.forms.join(", ")}</div>
+      <div class="tag">${d.group}</div>
     `;
 
     grid.appendChild(card);
@@ -200,13 +179,14 @@ function render(items) {
 function filter() {
   const term = search.value.toLowerCase();
 
-  const filtered = data.filter(d => {
-    const matchesGroup = activeGroup === "all" || d.group === activeGroup;
-    const matchesSearch =
+  const filtered = doodles.filter(d => {
+    const matchGroup = activeGroup === "all" || d.group === activeGroup;
+
+    const matchSearch =
       d.name.toLowerCase().includes(term) ||
       d.forms.some(f => f.toLowerCase().includes(term));
 
-    return matchesGroup && matchesSearch;
+    return matchGroup && matchSearch;
   });
 
   render(filtered);
@@ -225,8 +205,7 @@ function setGroup(group, el) {
 
 search.addEventListener("input", filter);
 
-render(data);
-
+render(doodles);
 </script>
 
 </body>
