@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Doodle Value Index</title>
+<title>Doodle Value Families</title>
 
 <style>
 body {
@@ -19,7 +19,6 @@ body {
   width:260px;
   background:#020617;
   padding:20px;
-  position:relative;
 }
 
 .sidebar button {
@@ -31,32 +30,17 @@ body {
   background:#1e293b;
   color:white;
   cursor:pointer;
-  transition:0.2s;
   text-align:left;
+  transition:0.2s;
 }
 
 .sidebar button:hover {
-  background:#334155;
   transform:translateX(3px);
 }
 
 .sidebar button.active {
   background:#334155;
   border-left:3px solid #60a5fa;
-  padding-left:12px;
-}
-
-/* INDICATOR */
-.indicator {
-  position:absolute;
-  left:0;
-  width:4px;
-  height:40px;
-  background:#60a5fa;
-  border-radius:4px;
-  transition:0.25s ease;
-  top:70px;
-  box-shadow:0 0 10px rgba(96,165,250,0.6);
 }
 
 /* MAIN */
@@ -67,62 +51,56 @@ body {
 
 .grid {
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
   gap:15px;
 }
 
-/* CARD */
-.card {
+/* FAMILY CARD */
+.family-card {
   background:#1e293b;
-  padding:12px;
   border-radius:12px;
-  position:relative;
-  transition:.2s;
-}
-
-.card:hover { transform:scale(1.03); }
-
-.header {
-  padding:6px 10px;
-  border-radius:10px 10px 0 0;
-  font-size:12px;
-  font-weight:bold;
-  text-align:center;
-  margin:-12px -12px 10px -12px;
-}
-
-.header.low { background:rgba(59,130,246,0.2); color:#60a5fa; }
-.header.mid { background:rgba(34,197,94,0.2); color:#4ade80; }
-.header.high { background:rgba(234,179,8,0.25); color:#facc15; }
-.header.hype { background:rgba(239,68,68,0.25); color:#f87171; }
-
-.low { box-shadow:0 0 10px rgba(59,130,246,0.2); }
-.mid { box-shadow:0 0 10px rgba(34,197,94,0.2); }
-.high { box-shadow:0 0 10px rgba(234,179,8,0.2); }
-.hype { box-shadow:0 0 20px rgba(239,68,68,0.4); }
-
-.star {
-  position:absolute;
-  top:8px;
-  left:8px;
+  padding:12px;
   cursor:pointer;
+  transition:0.2s;
 }
 
+.family-card:hover {
+  transform:scale(1.02);
+}
+
+.family-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:bold;
+}
+
+/* IMAGE */
 img {
   width:100%;
   border-radius:8px;
+  margin-top:10px;
 }
 
-.topbar {
-  display:flex;
-  margin-bottom:15px;
+/* COLLAPSE */
+.family-content {
+  display:none;
+  margin-top:10px;
+  font-size:13px;
+  opacity:0.9;
 }
 
-input {
-  padding:8px;
-  border-radius:8px;
-  border:none;
-  width:100%;
+.family-card.open .family-content {
+  display:block;
+}
+
+.forms {
+  margin-top:6px;
+  color:#93c5fd;
+}
+
+.values div {
+  padding:2px 0;
 }
 </style>
 </head>
@@ -130,148 +108,76 @@ input {
 <body>
 
 <div class="sidebar">
-
-<div class="indicator" id="indicator"></div>
-
 <h3>Filters</h3>
 <button onclick="setFilter('all')">All</button>
 <button onclick="setFilter('rising')">Rising</button>
 <button onclick="setFilter('high')">High Demand</button>
 <button onclick="setFilter('hype')">Hype</button>
-<button onclick="setFilter('fav')">Favorites</button>
-
 </div>
 
 <div class="main">
-
-<div class="topbar">
-  <input id="search" placeholder="Search doodles...">
-</div>
-
 <div class="grid" id="grid"></div>
-
 </div>
 
-<!-- LOAD DATA -->
 <script src="data.js"></script>
 
 <script>
 let activeFilter = "all";
-let favorites = JSON.parse(localStorage.getItem("fav")) || [];
-
 const grid = document.getElementById("grid");
 
-/* ✅ DIRECT ACCESS (FIXED) */
-const list = doodles;
-
-/* TIER */
-function getTier(v){
-  if(v <= 20) return "low";
-  if(v <= 200) return "mid";
-  if(v <= 1000) return "high";
-  return "hype";
-}
-
-/* LABEL */
-function getLabel(v){
-  if(v <= 20) return "LOW DEMAND";
-  if(v <= 200) return "MID DEMAND";
-  if(v <= 1000) return "HIGH DEMAND";
-  return "HYPE / OVERPAID";
-}
-
-/* TREND */
-function trendIcon(t){
-  if(t === "up") return "⬆️";
-  if(t === "down") return "⬇️";
-  return "➡️";
-}
-
-/* FAVORITE */
-function toggleFav(name){
-  if(favorites.includes(name)){
-    favorites = favorites.filter(f => f !== name);
-  } else {
-    favorites.push(name);
-  }
-  localStorage.setItem("fav", JSON.stringify(favorites));
-  render();
-}
-
-/* INDICATOR */
-function moveIndicator(index){
-  document.getElementById("indicator").style.top = (70 + index * 48) + "px";
-}
-
-function updateIndicator(){
-  const map = { all:0, rising:1, high:2, hype:3, fav:4 };
-  moveIndicator(map[activeFilter]);
-}
-
-/* ACTIVE BUTTON */
-function updateActiveButton(){
-  const btns = document.querySelectorAll(".sidebar button");
-  btns.forEach(b => b.classList.remove("active"));
-
-  const map = { all:0, rising:1, high:2, hype:3, fav:4 };
-  btns[map[activeFilter]]?.classList.add("active");
+/* TOGGLE FAMILY */
+function toggleFamily(card){
+  card.classList.toggle("open");
 }
 
 /* FILTER */
 function setFilter(f){
   activeFilter = f;
   render();
-  updateActiveButton();
-  updateIndicator();
 }
 
 /* RENDER */
 function render(){
-  const term = (document.getElementById("search").value || "").toLowerCase();
   grid.innerHTML = "";
 
-  list.forEach(d => {
-
-    if(!d) return;
-    if(term && !d.name.toLowerCase().includes(term)) return;
+  doodles.forEach(d => {
 
     if(activeFilter === "rising" && d.trend !== "up") return;
-    if(activeFilter === "high" && d.value < 200) return;
-    if(activeFilter === "hype" && d.value < 1000) return;
-    if(activeFilter === "fav" && !favorites.includes(d.name)) return;
-
-    const tier = getTier(d.value);
+    if(activeFilter === "high" && d.values.UHT6 < 10) return;
+    if(activeFilter === "hype" && d.values.UHT6 < 15) return;
 
     const card = document.createElement("div");
-    card.className = "card " + tier;
+    card.className = "family-card";
 
     card.innerHTML = `
-      <div class="header ${tier}">
-        ${getLabel(d.value)}
-      </div>
-
-      <div class="star" onclick="toggleFav('${d.name}')">
-        ${favorites.includes(d.name) ? "⭐" : "☆"}
+      <div class="family-header">
+        <div>${d.name}</div>
+        <div>▼</div>
       </div>
 
       <img src="${d.image}" onerror="this.src='https://via.placeholder.com/200'">
 
-      <h4>${d.name}</h4>
-      <p>💰 ${d.value}</p>
-      <p>${trendIcon(d.trend)}</p>
+      <div class="family-content">
+        <div class="forms">
+          Forms: ${d.forms.join(" → ")}
+        </div>
+
+        <div class="values">
+          ${Object.entries(d.values)
+            .map(([k,v]) => `<div>${k}: ${v}</div>`)
+            .join("")}
+        </div>
+      </div>
     `;
+
+    card.addEventListener("click", () => toggleFamily(card));
 
     grid.appendChild(card);
   });
 }
 
-/* SEARCH */
-document.getElementById("search").addEventListener("input", render);
-
 /* INIT */
 render();
-updateActiveButton();
-updateIndicator();
 </script>
 
 </body>
