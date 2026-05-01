@@ -24,6 +24,7 @@ body {
   top:15px;
   left:15px;
   z-index:9999;
+
   padding:10px 12px;
   border:none;
   border-radius:10px;
@@ -31,6 +32,13 @@ body {
   color:white;
   font-size:18px;
   cursor:pointer;
+
+  transition:0.3s ease;
+}
+
+/* 👉 MOVE BUTTON WHEN SIDEBAR IS OPEN */
+body.sidebar-open #toggleSidebarBtn {
+  left:260px;
 }
 
 /* ================= SIDEBAR ================= */
@@ -41,8 +49,10 @@ body {
   background:#020617;
   padding:20px;
   border-right:2px solid #1e293b;
+
   transition: transform 0.3s ease;
   transform: translateX(0);
+
   position: relative;
   z-index:20;
 }
@@ -79,8 +89,10 @@ body {
   padding:12px 14px;
   border:none;
   border-radius:12px;
+
   background:linear-gradient(145deg,#1e293b,#111827);
   color:#e2e8f0;
+
   cursor:pointer;
   text-align:left;
 }
@@ -162,21 +174,9 @@ body {
 .family-header {
   display:flex;
   justify-content:space-between;
-  align-items:center;
   font-weight:bold;
   color:white;
 }
-
-/* ================= TREND INDICATOR ================= */
-.trend {
-  margin-left:8px;
-  font-size:12px;
-  opacity:0.9;
-}
-
-.trend.up { color:#4ade80; }
-.trend.down { color:#f87171; }
-.trend.stable { color:#94a3b8; }
 
 /* ================= IMAGE ================= */
 img {
@@ -245,9 +245,12 @@ const grid = document.getElementById("grid");
 let searchQuery = "";
 let activeFilter = "all";
 
-/* TOGGLE */
+/* TOGGLE SIDEBAR */
 function toggleSidebar(){
-  document.querySelector(".sidebar").classList.toggle("hidden");
+  const sidebar = document.querySelector(".sidebar");
+  sidebar.classList.toggle("hidden");
+
+  document.body.classList.toggle("sidebar-open");
 }
 
 /* SEARCH */
@@ -268,20 +271,12 @@ function sortAZ(){
   render();
 }
 
-/* TREND ICON */
-function getTrendIcon(trend){
-  if(trend === "up") return "↑";
-  if(trend === "down") return "↓";
-  return "→";
-}
-
 /* RENDER */
 function render(){
   grid.innerHTML = "";
 
   let list = [...doodles];
 
-  // FILTER
   list = list.filter(d => {
     const v = d.values.UHT6;
 
@@ -292,7 +287,6 @@ function render(){
     return true;
   });
 
-  // SEARCH
   if(searchQuery){
     list = list.filter(d =>
       d.name.toLowerCase().includes(searchQuery) ||
@@ -300,10 +294,8 @@ function render(){
     );
   }
 
-  // SORT
   list.sort((a,b) => a.name.localeCompare(b.name));
 
-  // RENDER
   list.forEach(d => {
 
     const v = d.values.UHT6;
@@ -321,13 +313,7 @@ function render(){
 
     card.innerHTML = `
       <div class="family-header">
-        <div>
-          ${d.name}
-          <span class="trend ${d.trend}">
-            ${getTrendIcon(d.trend)}
-          </span>
-        </div>
-
+        <div>${d.name}</div>
         <div class="badge ${tier}">${badgeText}</div>
       </div>
 
