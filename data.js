@@ -4,34 +4,34 @@ const doodles = [
     value: 10,
     group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/Snobat.png",
-    forms: ["Snobat", "Snovul", "Glacilisk"]
+    forms: ["Snobat", "Cryotera"]
   },
   {
     name: "Bunsweet Line",
     value: 10,
     group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/Bunsweet.png",
-    forms: ["Bunsweet", "Bunnybuns", "Cinnamoon"]
+    forms: ["Bunsweet", "Bunswirl"]
   },
   {
-    name: "Pebblet Line",
+    name: "Pebblett Line",
     value: 10,
     group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/Pebblet.png",
-    forms: ["Pebblet", "Rockodile"]
+    forms: ["Pebblett", "Bolduo", "Monolugg"]
   },
   {
     name: "Fluppy Line",
     value: 10,
     group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/Fluppy.png",
-    forms: ["Fluppy", "Fluppix"]
+    forms: ["Fluppy"]
   },
   {
-    name: "Twiglet Line",
+    name: "Wiglet Line",
     value: 10,
     group: "Swarms",
     image: "https://static.wikia.nocookie.net/doodle-world/images/Twiglet.png",
-    forms: ["Twiglet", "Branchkin", "Florush"]
+    forms: ["Wiglet", "Tewwys Mum"]
   }
 ];
