@@ -62,6 +62,14 @@ body {
   padding:12px;
   cursor:pointer;
   overflow:hidden;
+  transition:transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* hover lift (safe, no layout shift) */
+.family-card:hover {
+  transform:scale(1.03);
+  z-index:5;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
 /* ================= SHIMMER ================= */
@@ -97,6 +105,7 @@ body {
   inset:0;
   padding:2px;
   border-radius:14px;
+  z-index:0;
 
   background:linear-gradient(135deg,#60a5fa,#1e3a8a);
 
@@ -220,6 +229,52 @@ img {
   color:#ffffff;
   transform:translateX(2px);
 }
+
+/* ================= HOVER PREVIEW PANEL ================= */
+.preview-panel {
+  position:fixed;
+  right:20px;
+  top:20px;
+  width:280px;
+  background:#0f172a;
+  border:1px solid #1e293b;
+  border-radius:14px;
+  padding:12px;
+  color:white;
+  opacity:0;
+  transform:translateY(10px);
+  transition:0.25s ease;
+  pointer-events:none;
+  z-index:50;
+}
+
+.preview-panel.active {
+  opacity:1;
+  transform:translateY(0);
+}
+
+.preview-panel img {
+  width:100%;
+  border-radius:10px;
+  margin-top:10px;
+  transition:transform 0.3s ease;
+}
+
+.preview-panel img:hover {
+  transform:scale(1.08);
+}
+
+#preview-forms {
+  margin-top:8px;
+  color:#93c5fd;
+  font-size:13px;
+}
+
+#preview-values {
+  margin-top:10px;
+  font-size:12px;
+  color:#e2e8f0;
+}
 </style>
 </head>
 
@@ -239,15 +294,41 @@ img {
   <div class="grid" id="grid"></div>
 </div>
 
+<!-- HOVER PREVIEW PANEL -->
+<div id="preview" class="preview-panel">
+  <h3 id="preview-name">Hover a Doodle</h3>
+  <img id="preview-img">
+  <div id="preview-forms"></div>
+  <div id="preview-values"></div>
+</div>
+
 <script src="data.js"></script>
 
 <script>
 const grid = document.getElementById("grid");
 
+const preview = document.getElementById("preview");
+const pName = document.getElementById("preview-name");
+const pImg = document.getElementById("preview-img");
+const pForms = document.getElementById("preview-forms");
+const pValues = document.getElementById("preview-values");
+
 function getColor(v){
   if(v <= 5) return "value-low";
   if(v <= 10) return "value-mid";
   return "value-high";
+}
+
+function showPreview(d){
+  preview.classList.add("active");
+
+  pName.textContent = d.name;
+  pImg.src = d.image;
+  pForms.textContent = d.forms.join(" → ");
+
+  pValues.innerHTML = Object.entries(d.values)
+    .map(([k,v]) => `<div>${k}: ${v}</div>`)
+    .join("");
 }
 
 function render(){
@@ -298,8 +379,8 @@ function render(){
       </div>
     `;
 
-    card.addEventListener("click", () => {
-      card.classList.toggle("open");
+    card.addEventListener("mouseenter", () => {
+      showPreview(d);
     });
 
     grid.appendChild(card);
