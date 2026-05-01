@@ -38,49 +38,87 @@ body {
   transform: translateX(-100%);
 }
 
-/* ================= DOCKED TOGGLE HANDLE ================= */
+/* ================= FLOATING GRIP HANDLE ================= */
 #toggleSidebarBtn {
   position: fixed;
-  top: 20px;
-  left: 240px; /* anchored to sidebar edge */
 
-  width: 34px;
-  height: 90px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  left: 240px;
+
+  width: 36px;
+  height: 110px;
 
   display:flex;
+  flex-direction:column;
   align-items:center;
   justify-content:center;
+  gap:6px;
 
   background: linear-gradient(145deg,#1e293b,#0f172a);
   color: white;
-  font-size: 18px;
 
   border: 1px solid rgba(255,255,255,0.08);
   border-left: none;
 
-  border-radius: 0 12px 12px 0;
+  border-radius: 0 14px 14px 0;
 
   cursor: pointer;
   z-index: 9999;
 
-  box-shadow: 6px 0 18px rgba(0,0,0,0.35);
+  box-shadow: 6px 0 20px rgba(0,0,0,0.4);
 
   transition:
     left 0.3s ease,
     transform 0.2s ease,
-    background 0.2s ease;
+    box-shadow 0.3s ease;
 }
 
-/* hover glow */
+/* grip lines (≡) */
+#toggleSidebarBtn .grip {
+  width: 14px;
+  height: 2px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 2px;
+  opacity:0.7;
+}
+
+/* pulse glow */
+#toggleSidebarBtn::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 rgba(99,102,241,0);
+  animation: pulseGlow 2.5s infinite;
+  pointer-events:none;
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 0 rgba(99,102,241,0); }
+  50% { box-shadow: 0 0 18px rgba(99,102,241,0.35); }
+  100% { box-shadow: 0 0 0 rgba(99,102,241,0); }
+}
+
+/* hover pop-out */
 #toggleSidebarBtn:hover {
-  background: linear-gradient(145deg,#334155,#1e293b);
-  transform: scale(1.05);
+  transform: translateY(-50%) translateX(4px) scale(1.05);
+  box-shadow: 10px 0 24px rgba(0,0,0,0.55);
 }
 
-/* when sidebar is hidden → dock handle moves to edge */
+/* when sidebar hidden */
 body.sidebar-hidden #toggleSidebarBtn {
   left: 10px;
-  border-radius: 12px;
+  border-radius: 14px;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+  #toggleSidebarBtn {
+    top: 65%;
+    height: 100px;
+  }
 }
 
 /* ================= TITLE ================= */
@@ -110,10 +148,8 @@ body.sidebar-hidden #toggleSidebarBtn {
   padding:12px 14px;
   border:none;
   border-radius:12px;
-
   background:linear-gradient(145deg,#1e293b,#111827);
   color:#e2e8f0;
-
   cursor:pointer;
   text-align:left;
 }
@@ -234,7 +270,11 @@ img {
 
 <body>
 
-<button id="toggleSidebarBtn" onclick="toggleSidebar()">☰</button>
+<button id="toggleSidebarBtn" onclick="toggleSidebar()">
+  <div class="grip"></div>
+  <div class="grip"></div>
+  <div class="grip"></div>
+</button>
 
 <div class="sidebar">
   <h2>
@@ -266,31 +306,26 @@ const grid = document.getElementById("grid");
 let searchQuery = "";
 let activeFilter = "all";
 
-/* TOGGLE */
 function toggleSidebar(){
   document.querySelector(".sidebar").classList.toggle("hidden");
   document.body.classList.toggle("sidebar-hidden");
 }
 
-/* SEARCH */
 document.getElementById("searchInput").addEventListener("input", e => {
   searchQuery = e.target.value.toLowerCase();
   render();
 });
 
-/* FILTER */
 function setFilter(f){
   activeFilter = f;
   render();
 }
 
-/* SORT */
 function sortAZ(){
   doodles.sort((a,b) => a.name.localeCompare(b.name));
   render();
 }
 
-/* RENDER */
 function render(){
   grid.innerHTML = "";
 
