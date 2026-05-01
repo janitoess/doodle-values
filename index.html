@@ -54,9 +54,11 @@ button {
   overflow:hidden;
 }
 
-.card:hover { transform:scale(1.03); }
+.card:hover {
+  transform:scale(1.03);
+}
 
-/* HEADER BAR */
+/* HEADER */
 .header {
   padding:6px 10px;
   border-radius:10px 10px 0 0;
@@ -66,34 +68,18 @@ button {
   margin:-12px -12px 10px -12px;
 }
 
-/* DEMAND COLORS */
-.header.low {
-  background: rgba(59,130,246,0.2);
-  color: #60a5fa;
-}
+.header.low { background:rgba(59,130,246,0.2); color:#60a5fa; }
+.header.mid { background:rgba(34,197,94,0.2); color:#4ade80; }
+.header.high { background:rgba(234,179,8,0.25); color:#facc15; }
+.header.hype { background:rgba(239,68,68,0.25); color:#f87171; }
 
-.header.mid {
-  background: rgba(34,197,94,0.2);
-  color: #4ade80;
-}
-
-.header.high {
-  background: rgba(234,179,8,0.25);
-  color: #facc15;
-}
-
-.header.hype {
-  background: rgba(239,68,68,0.25);
-  color: #f87171;
-}
-
-/* TIERS GLOW */
+/* TIERS */
 .low { box-shadow:0 0 10px rgba(59,130,246,0.2); }
 .mid { box-shadow:0 0 10px rgba(34,197,94,0.2); }
 .high { box-shadow:0 0 10px rgba(234,179,8,0.2); }
 .hype { box-shadow:0 0 20px rgba(239,68,68,0.4); }
 
-/* FAVORITE */
+/* STAR */
 .star {
   position:absolute;
   top:8px;
@@ -107,7 +93,7 @@ img {
   border-radius:8px;
 }
 
-/* TOP BAR */
+/* TOPBAR */
 .topbar {
   display:flex;
   gap:10px;
@@ -120,23 +106,6 @@ input {
   border:none;
   width:100%;
 }
-
-/* TRADE BOX */
-.trade {
-  margin-top:25px;
-  padding:15px;
-  background:#020617;
-  border-radius:10px;
-}
-
-.trade input {
-  margin-bottom:10px;
-}
-
-.result {
-  margin-top:10px;
-  font-weight:bold;
-}
 </style>
 </head>
 
@@ -146,7 +115,7 @@ input {
   <h3>Filters</h3>
   <button onclick="setFilter('all')">All</button>
   <button onclick="setFilter('rising')">⬆️ Rising</button>
-  <button onclick="setFilter('high')">🔥 High Demand</button>
+  <button onclick="setFilter('high')">🔥 High</button>
   <button onclick="setFilter('hype')">🚨 Hype</button>
   <button onclick="setFilter('fav')">⭐ Favorites</button>
 </div>
@@ -159,22 +128,6 @@ input {
 
 <div class="grid" id="grid"></div>
 
-<!-- TRADE CALCULATOR -->
-<div class="trade">
-  <h3>Advanced Trade Calculator</h3>
-
-  <p>Your Offer</p>
-  <input id="offer1" placeholder="Snobat, Fluppy">
-
-  <p>Their Offer</p>
-  <input id="offer2" placeholder="Pebblett">
-
-  <button onclick="calculateTrade()">Evaluate Trade</button>
-
-  <div class="result" id="tradeResult"></div>
-  <div id="tradeDetails"></div>
-</div>
-
 </div>
 
 <script src="data.js"></script>
@@ -185,7 +138,7 @@ let favorites = JSON.parse(localStorage.getItem("fav")) || [];
 
 const grid = document.getElementById("grid");
 
-/* TIER SYSTEM */
+/* TIER */
 function getTier(v){
   if(v<=20) return "low";
   if(v<=200) return "mid";
@@ -194,10 +147,10 @@ function getTier(v){
 }
 
 /* LABEL */
-function getDemandLabel(value){
-  if(value <= 20) return "LOW DEMAND";
-  if(value <= 200) return "MID DEMAND";
-  if(value <= 1000) return "HIGH DEMAND";
+function getDemandLabel(v){
+  if(v<=20) return "LOW DEMAND";
+  if(v<=200) return "MID DEMAND";
+  if(v<=1000) return "HIGH DEMAND";
   return "HYPE / OVERPAID";
 }
 
@@ -206,13 +159,6 @@ function trendIcon(t){
   if(t==="up") return "⬆️";
   if(t==="down") return "⬇️";
   return "➡️";
-}
-
-/* DEMAND MULTIPLIER */
-function getDemandMultiplier(trend){
-  if(trend === "up") return 1.1;
-  if(trend === "down") return 0.9;
-  return 1;
 }
 
 /* FAVORITES */
@@ -226,54 +172,15 @@ function toggleFav(name){
   render();
 }
 
-/* FIND */
-function findDoodle(name){
-  return doodles.find(d =>
-    d.name.toLowerCase().includes(name.trim().toLowerCase())
-  );
-}
-
-/* CALC SIDE */
-function calculateSide(input){
-  const names = input.split(",");
-  let total = 0;
-  let details = [];
-
-  names.forEach(n => {
-    const d = findDoodle(n);
-    if(d){
-      const adjusted = Math.floor(d.value * getDemandMultiplier(d.trend));
-      total += adjusted;
-      details.push(`${d.name} (${adjusted})`);
-    }
-  });
-
-  return { total, details };
-}
-
-/* TRADE */
-function calculateTrade(){
-  const a = calculateSide(document.getElementById("offer1").value);
-  const b = calculateSide(document.getElementById("offer2").value);
-
-  const diff = a.total - b.total;
-
-  let result = "";
-  if(Math.abs(diff) <= 5) result = "⚖️ Fair";
-  else if(diff > 5) result = "📈 Win";
-  else result = "📉 Loss";
-
-  document.getElementById("tradeResult").innerText =
-    `${result} (Diff: ${diff})`;
-
-  document.getElementById("tradeDetails").innerText =
-    `You: ${a.total} | Them: ${b.total}`;
+/* FILTER */
+function setFilter(f){
+  filterType=f;
+  render();
 }
 
 /* RENDER */
 function render(){
   const term = document.getElementById("search").value.toLowerCase();
-
   grid.innerHTML="";
 
   doodles.forEach(d=>{
@@ -298,7 +205,7 @@ function render(){
         ${favorites.includes(d.name) ? "⭐" : "☆"}
       </div>
 
-      <img src="${d.image}" 
+      <img src="${d.image}"
       onerror="this.src='https://via.placeholder.com/200'">
 
       <h4>${d.name}</h4>
@@ -310,12 +217,7 @@ function render(){
   });
 }
 
-/* FILTER */
-function setFilter(f){
-  filterType=f;
-  render();
-}
-
+/* SEARCH */
 document.getElementById("search").addEventListener("input", render);
 
 render();
