@@ -54,7 +54,7 @@ body {
   gap:15px;
 }
 
-/* ================= CARD (FIXED GRADIENT SYSTEM) ================= */
+/* ================= CARD ================= */
 .family-card {
   position:relative;
   background:#1e293b;
@@ -62,37 +62,64 @@ body {
   padding:12px;
   cursor:pointer;
   overflow:hidden;
-  z-index:0;
 }
 
-/* BORDER LAYER (reliable version) */
-.family-card::after {
+/* ================= BORDER BASE LAYER ================= */
+.family-card::before {
   content:"";
   position:absolute;
   inset:0;
-  padding:2px;
   border-radius:14px;
-  background:linear-gradient(135deg,#60a5fa,#1e3a8a);
-  z-index:-1;
+  padding:2px;
+  z-index:0;
+  pointer-events:none;
 }
 
+/* ================= SHIMMER OVERLAY ================= */
+.family-card::after {
+  content:"";
+  position:absolute;
+  top:0;
+  left:-120%;
+  width:60%;
+  height:100%;
+  background:linear-gradient(
+    120deg,
+    transparent 0%,
+    rgba(255,255,255,0.06) 45%,
+    rgba(255,255,255,0.14) 50%,
+    rgba(255,255,255,0.06) 55%,
+    transparent 100%
+  );
+  transform:skewX(-20deg);
+  animation: shimmer 5s infinite;
+  pointer-events:none;
+}
+
+@keyframes shimmer {
+  0% { left:-120%; }
+  100% { left:120%; }
+}
+
+/* ================= RARITY BORDERS ================= */
+
 /* LOW */
-.family-card.low::after {
+.family-card.low::before {
   background:linear-gradient(135deg,#60a5fa,#1e3a8a);
 }
 
 /* MID */
-.family-card.mid::after {
+.family-card.mid::before {
   background:linear-gradient(135deg,#4ade80,#14532d);
 }
 
 /* HIGH */
-.family-card.high::after {
+.family-card.high::before {
   background:linear-gradient(135deg,#facc15,#92400e);
 }
 
-/* HYPE (animated) */
-.family-card.hype::after {
+/* HYPE */
+.family-card.hype::before {
   background:linear-gradient(270deg,#f87171,#fb7185,#f97316);
   background-size:400% 400%;
   animation:hypeBorder 3s ease infinite;
@@ -144,17 +171,9 @@ img {
   color:#e2e8f0;
 }
 
-.value-low {
-  color:#f87171;
-}
-
-.value-mid {
-  color:#facc15;
-}
-
-.value-high {
-  color:#4ade80;
-}
+.value-low { color:#f87171; }
+.value-mid { color:#facc15; }
+.value-high { color:#4ade80; }
 
 .values div:hover {
   color:#ffffff;
