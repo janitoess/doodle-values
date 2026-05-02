@@ -24,6 +24,7 @@ body {
   width:240px;
   min-width:240px;
   height:100vh;
+
   background: rgba(2, 6, 23, 0.92);
   backdrop-filter: blur(10px);
 
@@ -39,24 +40,14 @@ body {
   transition: transform 0.35s ease, opacity 0.25s ease;
 }
 
-/* 🔥 FIXED: NO MORE GHOST OVERLAY */
+/* VISUAL HIDE ONLY (NO STACKING BUGS) */
 .sidebar.hidden {
   transform: translateX(-110%);
   opacity: 0;
-
   pointer-events: none;
-  user-select: none;
-
-  /* KEY FIX: removes stacking interference completely */
-  z-index: -10;
 }
 
-/* restore z-index when visible */
-.sidebar:not(.hidden) {
-  z-index: 20;
-}
-
-/* ================= FLOATING GRIP HANDLE ================= */
+/* ================= GRIP HANDLE ================= */
 #toggleSidebarBtn {
   position: fixed;
   top: 50%;
@@ -87,7 +78,6 @@ body {
   transition: left 0.35s ease, transform 0.2s ease;
 }
 
-/* grip lines */
 #toggleSidebarBtn .grip {
   width: 14px;
   height: 2px;
@@ -119,10 +109,9 @@ body {
 /* when hidden */
 body.sidebar-hidden #toggleSidebarBtn {
   left: 10px;
-  border-radius: 14px;
 }
 
-/* ================= INPUT SAFETY ================= */
+/* ================= SAFETY ================= */
 * {
   box-sizing: border-box;
 }
@@ -315,8 +304,24 @@ let searchQuery = "";
 let activeFilter = "all";
 
 function toggleSidebar(){
-  document.querySelector(".sidebar").classList.toggle("hidden");
-  document.body.classList.toggle("sidebar-hidden");
+  const sidebar = document.querySelector(".sidebar");
+
+  const isHidden = sidebar.classList.contains("hidden");
+
+  if(!isHidden){
+    sidebar.classList.add("hidden");
+    document.body.classList.add("sidebar-hidden");
+
+    setTimeout(() => {
+      sidebar.style.pointerEvents = "none";
+    }, 350);
+
+  } else {
+    sidebar.classList.remove("hidden");
+    document.body.classList.remove("sidebar-hidden");
+
+    sidebar.style.pointerEvents = "auto";
+  }
 }
 
 document.getElementById("searchInput").addEventListener("input", e => {
