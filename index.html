@@ -40,7 +40,7 @@ body {
   transition: transform 0.35s ease, opacity 0.25s ease;
 }
 
-/* VISUAL HIDE ONLY (NO STACKING BUGS) */
+/* VISUAL HIDE */
 .sidebar.hidden {
   transform: translateX(-110%);
   opacity: 0;
@@ -86,32 +86,17 @@ body {
   opacity:0.75;
 }
 
-/* pulse glow */
-#toggleSidebarBtn::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius: inherit;
-  animation: pulseGlow 2.6s infinite;
-}
-
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 0 rgba(99,102,241,0); }
-  50% { box-shadow: 0 0 18px rgba(99,102,241,0.35); }
-  100% { box-shadow: 0 0 0 rgba(99,102,241,0); }
-}
-
-/* hover pop */
+/* hover */
 #toggleSidebarBtn:hover {
   transform: translateY(-50%) translateX(5px) scale(1.05);
 }
 
-/* when hidden */
+/* hidden state */
 body.sidebar-hidden #toggleSidebarBtn {
   left: 10px;
 }
 
-/* ================= SAFETY ================= */
+/* ================= GLOBAL SAFETY ================= */
 * {
   box-sizing: border-box;
 }
@@ -312,15 +297,13 @@ function toggleSidebar(){
     sidebar.classList.add("hidden");
     document.body.classList.add("sidebar-hidden");
 
-    setTimeout(() => {
-      sidebar.style.pointerEvents = "none";
-    }, 350);
-
+    // 🔥 HARD LOCK: prevents any overlay blocking
+    sidebar.setAttribute("inert", "");
   } else {
     sidebar.classList.remove("hidden");
     document.body.classList.remove("sidebar-hidden");
 
-    sidebar.style.pointerEvents = "auto";
+    sidebar.removeAttribute("inert");
   }
 }
 
