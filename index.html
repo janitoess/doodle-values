@@ -47,25 +47,31 @@ html, body {
 /* ================= MAIN ================= */
 .main {
   width:100%;
-  padding:20px;
-  overflow-y:auto;
 
+  /* 🔥 ADDED OFFSET */
+  padding:20px 20px 20px 40px;
+
+  overflow-y:auto;
   transition: transform 0.35s ease;
 }
 
-/* 🔥 PUSH EFFECT */
+/* PUSH EFFECT */
 body:not(.sidebar-hidden) .main {
   transform: translateX(120px);
 }
 
-/* 📱 mobile stronger push */
 @media (max-width: 768px) {
   body:not(.sidebar-hidden) .main {
     transform: translateX(180px);
   }
+
+  /* mobile spacing */
+  .main {
+    padding:20px 16px;
+  }
 }
 
-/* ================= DIM BACKGROUND ================= */
+/* ================= DIM ================= */
 body:not(.sidebar-hidden)::after {
   content:"";
   position:fixed;
