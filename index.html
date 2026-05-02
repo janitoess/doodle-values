@@ -15,14 +15,13 @@ html, body {
   overflow-x:hidden;
 }
 
-body {
-  display:flex;
-}
-
 /* ================= SIDEBAR ================= */
 .sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+
   width:240px;
-  min-width:240px;
   height:100vh;
 
   background: rgba(2, 6, 23, 0.92);
@@ -31,39 +30,52 @@ body {
   padding:20px;
   border-right:2px solid #1e293b;
 
-  position: relative;
-
-  /* OPEN STATE LAYER */
-  z-index: 20;
+  z-index:50;
 
   transform: translateX(0);
   opacity: 1;
 
-  transition: transform 0.35s ease, opacity 0.25s ease, z-index 0s linear 0.35s;
+  transition: transform 0.35s ease, opacity 0.25s ease;
 }
 
-/* 🔥 FINAL FIX: HARD DROP BEHIND CONTENT WHEN HIDDEN */
 .sidebar.hidden {
   transform: translateX(-110%);
   opacity: 0;
-
   pointer-events: none;
-
-  /* CRITICAL: prevents overlay blocking */
-  z-index: -10;
 }
 
-/* ================= MAIN ALWAYS ABOVE ================= */
+/* ================= MAIN ================= */
 .main {
-  flex:1;
+  width:100%;
   padding:20px;
   overflow-y:auto;
 
-  position: relative;
-  z-index: 10;
+  transition: transform 0.35s ease;
 }
 
-/* ================= FLOATING GRIP HANDLE ================= */
+/* 🔥 PUSH EFFECT */
+body:not(.sidebar-hidden) .main {
+  transform: translateX(120px);
+}
+
+/* 📱 mobile stronger push */
+@media (max-width: 768px) {
+  body:not(.sidebar-hidden) .main {
+    transform: translateX(180px);
+  }
+}
+
+/* ================= DIM BACKGROUND ================= */
+body:not(.sidebar-hidden)::after {
+  content:"";
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.25);
+  pointer-events:none;
+  z-index:5;
+}
+
+/* ================= TOGGLE ================= */
 #toggleSidebarBtn {
   position: fixed;
   top: 50%;
@@ -94,7 +106,6 @@ body {
   transition: left 0.35s ease, transform 0.2s ease;
 }
 
-/* grip lines */
 #toggleSidebarBtn .grip {
   width: 14px;
   height: 2px;
@@ -103,52 +114,12 @@ body {
   opacity:0.75;
 }
 
-/* hover */
 #toggleSidebarBtn:hover {
   transform: translateY(-50%) translateX(5px) scale(1.05);
 }
 
-/* when hidden */
 body.sidebar-hidden #toggleSidebarBtn {
   left: 10px;
-}
-
-/* ================= GLOBAL SAFETY ================= */
-* {
-  box-sizing: border-box;
-}
-
-/* ================= TITLE ================= */
-.sidebar h2 {
-  color:white;
-  margin-bottom:14px;
-  font-size:16px;
-  line-height:1.2;
-}
-
-/* ================= SEARCH ================= */
-.sidebar input {
-  width:100%;
-  padding:10px 12px;
-  margin-bottom:12px;
-  border-radius:10px;
-  border:none;
-  background:#0f172a;
-  color:white;
-  box-shadow: inset 0 0 0 1px #1e293b;
-}
-
-/* ================= BUTTONS ================= */
-.sidebar button {
-  width:100%;
-  margin-bottom:10px;
-  padding:12px 14px;
-  border:none;
-  border-radius:12px;
-  background:linear-gradient(145deg,#1e293b,#111827);
-  color:#e2e8f0;
-  cursor:pointer;
-  text-align:left;
 }
 
 /* ================= GRID ================= */
@@ -255,6 +226,34 @@ img {
   color:#93c5fd;
   margin-top:6px;
 }
+
+/* ================= SIDEBAR CONTENT ================= */
+.sidebar h2 {
+  color:white;
+  margin-bottom:14px;
+  font-size:16px;
+}
+
+.sidebar input {
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:none;
+  background:#0f172a;
+  color:white;
+}
+
+.sidebar button {
+  width:100%;
+  margin-bottom:8px;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#1e293b;
+  color:white;
+  cursor:pointer;
+}
 </style>
 </head>
 
@@ -267,19 +266,16 @@ img {
 </button>
 
 <div class="sidebar">
-  <h2>
-    Doodle World Value Index<br>
-    <span style="opacity:0.6; font-size:12px;">by janitoess</span>
-  </h2>
+  <h2>Doodle World Value Index<br><span style="opacity:.6;font-size:12px;">by janitoess</span></h2>
 
-  <input id="searchInput" placeholder="🔍 Search doodles..." />
+  <input id="searchInput" placeholder="🔍 Search doodles...">
 
   <button onclick="setFilter('all')">All</button>
   <button onclick="setFilter('rising')">Rising</button>
   <button onclick="setFilter('high')">High</button>
   <button onclick="setFilter('hype')">Hype</button>
 
-  <hr style="border:1px solid #1e293b; margin:12px 0;">
+  <hr style="border:1px solid #1e293b;margin:12px 0;">
 
   <button onclick="sortAZ()">Sort: A → Z</button>
 </div>
@@ -297,9 +293,7 @@ let searchQuery = "";
 let activeFilter = "all";
 
 function toggleSidebar(){
-  const sidebar = document.querySelector(".sidebar");
-
-  sidebar.classList.toggle("hidden");
+  document.querySelector(".sidebar").classList.toggle("hidden");
   document.body.classList.toggle("sidebar-hidden");
 }
 
@@ -367,7 +361,6 @@ function render(){
 
       <div class="family-content">
         <div class="forms">${d.forms.join(" → ")}</div>
-
         <div class="values">
           ${Object.entries(d.values).map(([k,v]) =>
             `<div>${k}: ${v}</div>`
