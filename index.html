@@ -32,22 +32,38 @@ body {
   border-right:2px solid #1e293b;
 
   position: relative;
-  z-index:20;
+
+  /* OPEN STATE LAYER */
+  z-index: 20;
 
   transform: translateX(0);
   opacity: 1;
 
-  transition: transform 0.35s ease, opacity 0.25s ease;
+  transition: transform 0.35s ease, opacity 0.25s ease, z-index 0s linear 0.35s;
 }
 
-/* VISUAL HIDE */
+/* 🔥 FINAL FIX: HARD DROP BEHIND CONTENT WHEN HIDDEN */
 .sidebar.hidden {
   transform: translateX(-110%);
   opacity: 0;
+
   pointer-events: none;
+
+  /* CRITICAL: prevents overlay blocking */
+  z-index: -10;
 }
 
-/* ================= GRIP HANDLE ================= */
+/* ================= MAIN ALWAYS ABOVE ================= */
+.main {
+  flex:1;
+  padding:20px;
+  overflow-y:auto;
+
+  position: relative;
+  z-index: 10;
+}
+
+/* ================= FLOATING GRIP HANDLE ================= */
 #toggleSidebarBtn {
   position: fixed;
   top: 50%;
@@ -78,6 +94,7 @@ body {
   transition: left 0.35s ease, transform 0.2s ease;
 }
 
+/* grip lines */
 #toggleSidebarBtn .grip {
   width: 14px;
   height: 2px;
@@ -91,7 +108,7 @@ body {
   transform: translateY(-50%) translateX(5px) scale(1.05);
 }
 
-/* hidden state */
+/* when hidden */
 body.sidebar-hidden #toggleSidebarBtn {
   left: 10px;
 }
@@ -132,15 +149,6 @@ body.sidebar-hidden #toggleSidebarBtn {
   color:#e2e8f0;
   cursor:pointer;
   text-align:left;
-}
-
-/* ================= MAIN ================= */
-.main {
-  flex:1;
-  padding:20px;
-  overflow-y:auto;
-  position:relative;
-  z-index:1;
 }
 
 /* ================= GRID ================= */
@@ -291,20 +299,8 @@ let activeFilter = "all";
 function toggleSidebar(){
   const sidebar = document.querySelector(".sidebar");
 
-  const isHidden = sidebar.classList.contains("hidden");
-
-  if(!isHidden){
-    sidebar.classList.add("hidden");
-    document.body.classList.add("sidebar-hidden");
-
-    // 🔥 HARD LOCK: prevents any overlay blocking
-    sidebar.setAttribute("inert", "");
-  } else {
-    sidebar.classList.remove("hidden");
-    document.body.classList.remove("sidebar-hidden");
-
-    sidebar.removeAttribute("inert");
-  }
+  sidebar.classList.toggle("hidden");
+  document.body.classList.toggle("sidebar-hidden");
 }
 
 document.getElementById("searchInput").addEventListener("input", e => {
